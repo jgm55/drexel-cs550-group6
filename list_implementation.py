@@ -6,102 +6,68 @@
 # Tom Houman
 # Joe Muoio
 
-######   LEXER	    ###############################
-import sys
-
-import ply.yacc as yacc
-from ply import lex
-
-tokens = (
-	'COMMA',
-	'LSQUARE',
-	'RSQUARE',
-	'NUMBER',
-)
-
-t_ignore = ' \t'
-
-	# These are the simple maps
-
-t_COMMA     = r','
-t_LSQUARE	= r'\['
-t_RSQUARE	= r'\]'
-
-
-def t_NUMBER( t ) :
-	r'[0-9]+'
-
-		# t.value holds the string that matched.  Dynamic typing - no unions
-	t.value = int( t.value )
-	return t
-
-def t_newline( t ):
-	r'\n+'
-	t.lexer.lineno += len( t.value )
-	
-# Error handling rule
-def t_error( t ):
-	print "Illegal character '%s' on line %d" % ( t.value[0], t.lexer.lineno )
-	return t
-	#t.lexer.skip( 1 )
-
-  # Here is where we build the lexer, after defining it (above)
-lex.lex()
-
-######   LEXER (end)   ###############################
-
-
-######   YACC   #####################################
+# Grammar
 
 import ply.yacc as yacc
 
 def p_list( p ) :
 	'list : LSQUARE sequence RSQUARE'
-	p[0] = p[2]
+	p[0] = List(p[2])
 	#print "to [seq]",p[0]
+
 def p_empty_list( p ) :
 	'list : LSQUARE RSQUARE'
-	p[0] = []	
+	p[0] = List([])
 	#print "to empty", p[0]
+
 def p_sequence( p ):
 	'sequence : list_element COMMA sequence'
 	p[0] = [p[1]] + p[3]
 	#print "to list , seq", p[0]
+
 def p_sequence_list_element( p ):
 	'sequence : list_element'
 	p[0] = [p[1]]
 	#print "tolistElem", p[0]
-'''
-def p_list_element( p ):
-	'list_element : list'
-	p[0] = p[1]'''
 
-def p_list_element_expr( p ):
-	'list_element : expr'
-	#???
+def p_list_element_element( p ):
+	'list_element : element'
 	p[0] = p[1]
 	#print "toexpr", p[0]
-def p_expr_number( p ):
-	'expr : NUMBER'
-	p[0] = p[1]
+
+def p_element_number( p ):
+	'element : NUMBER'
+	p[0] = Number(p[1])
 	#print "tonumber", p[0]
-def p_expr_list( p ):
-	'expr : list'
+
+def p_element_list( p ):
+	'element : list'
 	p[0] = p[1]
 	#print " tolist", p[0]
+
+
+def func_call_cons( p ):
+  'func_call : CONS LPAREN element COMMA  list RPAREN'
+  p[0] = def_cons(p[2],p[3])
+
+def func_call_car( p ):
+  'func_call : CAR LPAREN list RPAREN'
+  p[0] = def_car(p[2],p[3])
+
+def func_call_cdr( p ):
+  'func_call : CDR LPAREN list RPAREN'
+  p[0] = def_cdr(p[2],p[3])
+
+def func_call_nullp( p ):
+  'func_call : NULLP LPAREN list RPAREN'
+  p[0] = def_nullp(p[2],p[3])
+
+def func_call_intp( p ):
+  'func_call : INTP LPAREN element RPAREN'
+  p[0] = def_intp(p[2],p[3])
+
+def func_call_listp( p ):
+  'func_call : LISTP LPAREN element RPAREN'
+  p[0] = def_listp(p[2],p[3])
+
 yacc.yacc()
-
-if __name__ == '__main__' :
-
-	userIn = sys.stdin.readlines()
-		
-	input = ''.join( ''.join(userIn).split());
-	
-	result = yacc.parse( input )
-	print result
-	
-	print ""
-
-	
-	
-	

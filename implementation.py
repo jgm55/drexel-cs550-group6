@@ -12,8 +12,11 @@
 # Modified from code provided by Kurt Schmidt
 
 import sys
-import list_implementation
-import structures
+#import list_implementation
+from structures import *
+from  list_structures import *
+#import list_functions
+#from list_functions import *
 
 ######   LEXER   ###############################
 
@@ -42,7 +45,13 @@ tokens = (
 	'DEFINE',
 	'PROC',
 	'END',
-	'IDENT'
+	'IDENT',
+	'CONS',
+	'CDR',
+	'CAR',
+	'NULLP',
+	'INTP',
+	'LISTP'
 )
 
 	# These are all caught in the IDENT rule, typed there.
@@ -56,7 +65,13 @@ reserved = {
 		'fi'		: 'FI',
 		'define': 'DEFINE',
 		'proc'	: 'PROC',
-		'end'		: 'END'
+		'end'		: 'END',
+		'car' : 'CAR',
+		'cdr' : 'CDR',
+		'nullp' : 'NULLP',
+		'cons' : 'CONS',
+		'intp' : 'INTP',
+		'listp': 'LISTP'
 		}
 
 # Now, this section.  We have a mapping, REs to token types (please note
@@ -115,22 +130,24 @@ import ply.yacc as yacc
 	# The rule is given in the doc string
 
 def p_program( p ) :
-  'program : stmt_list'
-  P = Program( p[1] )
-  #P.display()
-  print 'Running Program'
-  P.eval()
-  P.dump()
+	'program : stmt_list'
+	print "PROGRAM"
+	P = Program( p[1] )
+	#P.display()
+	print 'Running Program'
+	P.eval()
+	P.dump()
 
 def p_stmt_list( p ) :
- '''stmt_list : stmt SEMICOLON stmt_list
+	'''stmt_list : stmt SEMICOLON stmt_list
        | stmt'''
- if len( p ) == 2 :  # single stmt => new list
-   p[0] = StmtList()
-   p[0].insert( p[1] )
- else :  # we have a stmtList, keep adding to front
-   p[3].insert( p[1] )
-   p[0] = p[3]
+	
+	if len( p ) == 2 :  # single stmt => new list
+		p[0] = StmtList()
+		p[0].insert( p[1] )
+	else :  # we have a stmtList, keep adding to front
+		p[3].insert( p[1] )
+		p[0] = p[3]
 
 def p_stmt( p ) :
 	'''stmt : assign_stmt
@@ -217,6 +234,72 @@ def p_func_call( p ) :
 def p_error( p ):
 	print "Syntax error in input!", str( p )
 	sys.exit( 2 )
+	
+########################### was in list implementation #############################3
+
+def p_concat( p ) :
+	'expr : expr CONCAT expr'
+	p[0] = Concat( p[1], p[3] )
+
+def p_list( p ) :
+	'list : LSQUARE sequence RSQUARE'
+	p[0] = List(p[2])
+	#print "to [seq]",p[0]
+
+def p_empty_list( p ) :
+	'list : LSQUARE RSQUARE'
+	p[0] = List([])
+	#print "to empty", p[0]
+
+def p_sequence( p ):
+	'sequence : list_element COMMA sequence'
+	p[0] = [p[1]] + p[3]
+	#print "to list , seq", p[0]
+
+def p_sequence_list_element( p ):
+	'sequence : list_element'
+	p[0] = [p[1]]
+	#print "tolistElem", p[0]
+
+def p_list_element_element( p ):
+	'list_element : expr'
+	p[0] = p[1]
+	#print "toexpr", p[0]
+
+def p_element_list( p ):
+	'list_element : list'
+	p[0] = p[1]
+	#print " tolist", p[0]
+	
+def p_expr_to_list( p ):
+	'expr : list'
+	p[0] = p[1]
+
+def p_func_call_cons( p ):
+	'func_call : CONS LPAREN IDENT COMMA IDENT RPAREN'
+	p[0] = Cons(p[3],p[5])
+
+def p_func_call_car( p ):
+	'func_call : CAR LPAREN IDENT RPAREN'
+	p[0] = Car(p[3])
+
+def p_func_call_cdr( p ):
+	'func_call : CDR LPAREN IDENT RPAREN'
+	p[0] = Cdr(p[3])
+
+def p_func_call_nullp( p ):
+	'func_call : NULLP LPAREN list RPAREN'
+	p[0] = Nullp(p[3])
+
+def p_func_call_intp( p ):
+	'func_call : INTP LPAREN list_element RPAREN'
+	p[0] = Nullp(p[3])
+
+def p_func_call_listp( p ):
+	'func_call : LISTP LPAREN list_element RPAREN'
+	p[0] = Listp(p[3])
+
+ ##############################################
 
 	# now, build the parser
 yacc.yacc()
@@ -236,6 +319,9 @@ def test_scanner( arg=sys.argv ) :
 		print tok
 		tok = lex.token()
 
+#def initalize_builtins():
+#	'define_stmt : DEFINE IDENT PROC LPAREN param_list RPAREN stmt_list END'
+#	DefineStmt( 'car', Proc( 'L',  ))
 
 def test_parser( arg=sys.argv ) :
 
@@ -263,8 +349,14 @@ def test_parser( arg=sys.argv ) :
 	#done;
 	#x := 5;
 	#sum( x )'''
+	#initialize_builtins()
+	print "Please enter the program,  terminate with CTRL+D on a new line"
 
-	data = sys.stdin.read()
+	data = ""
+	
+	data 
+	
+	data += sys.stdin.read()
 
 	yacc.parse( data )
 

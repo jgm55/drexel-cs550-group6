@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/python
 #
 # Classes to represent underlying data structures for the grammar
@@ -11,6 +9,7 @@
 # Modified from code provided by Kurt Schmidt
 
 import sys
+#from list_structures import List
 
 ####  CONSTANTS   ################
 
@@ -34,7 +33,11 @@ class Expr :
 
 		raise NotImplementedError(
 			'Expr.eval: virtual method.  Must be overridden.' )
-
+	def isList(self):
+		return False
+	def isInt(self):
+		return False
+	
 	def display( self, nt, ft, depth=0 ) :
 		'For debugging.'
 		raise NotImplementedError(
@@ -58,9 +61,11 @@ class Times( Expr ) :
 
 	def __init__( self, lhs, rhs ) :
 		'''lhs, rhs are Expr's, the operands'''
-
+		
 		# test type here?
 		# if type( lhs ) == type( Expr ) :
+		if lhs.isList() or rhs.isList():
+			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
 	
@@ -78,6 +83,8 @@ class Plus( Expr ) :
 	'''expression for binary addition'''
 
 	def __init__( self, lhs, rhs ) :
+		if isinstance(lhs, List) or isinstance(rhs, List):
+			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
 	
@@ -95,6 +102,8 @@ class Minus( Expr ) :
 	'''expression for binary subtraction'''
 
 	def __init__( self, lhs, rhs ) :
+		if isinstance(lhs, List) or isinstance(rhs, List):
+			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
 	
@@ -307,9 +316,10 @@ class Program :
 		print "Function Table"
 		for k in self.funcTable :
 			print "  %s" % str(k)
+		print ""
+		self.display()
 
 	def display( self, depth=0 ) :
 		print "%sPROGRAM :" % (tabstop*depth)
 		self.stmtList.display( self.nameTable, self.funcTable )
-
 
