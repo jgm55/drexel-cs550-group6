@@ -1,0 +1,15 @@
+define iterativelength proc (l)
+	c:=0;
+	while listp(l) do 
+		l:=car(l);
+		c:=c+1;
+	od;
+end;
+
+
+
+
+
+
+
+

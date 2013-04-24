@@ -83,7 +83,7 @@ class Plus( Expr ) :
 	'''expression for binary addition'''
 
 	def __init__( self, lhs, rhs ) :
-		if isinstance(lhs, List) or isinstance(rhs, List):
+		if lhs.isList() or rhs.isList():
 			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
@@ -102,7 +102,7 @@ class Minus( Expr ) :
 	'''expression for binary subtraction'''
 
 	def __init__( self, lhs, rhs ) :
-		if isinstance(lhs, List) or isinstance(rhs, List):
+		if lhs.isList() or rhs.isList():
 			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs

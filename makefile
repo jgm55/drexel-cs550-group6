@@ -15,7 +15,6 @@ view-func2 :
 	echo ""
 
 
-
 clean :
 	@rm -f ./*/parsetab.py
 	@rm -f ./*/parsetab.pyc
