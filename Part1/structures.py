@@ -83,7 +83,7 @@ class Plus( Expr ) :
 	'''expression for binary addition'''
 
 	def __init__( self, lhs, rhs ) :
-		if isinstance(lhs, List) or isinstance(rhs, List):
+		if lhs.isList() or rhs.isList():
 			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
@@ -102,7 +102,7 @@ class Minus( Expr ) :
 	'''expression for binary subtraction'''
 
 	def __init__( self, lhs, rhs ) :
-		if isinstance(lhs, List) or isinstance(rhs, List):
+		if lhs.isList() or rhs.isList():
 			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
@@ -280,6 +280,8 @@ class Proc :
 		# bind parameters in new name table (the only things there right now)
 			# use zip, bastard
 		for i in range( len( args )) :
+			print "self.parList[i]:",self.parList[i]
+			print "args[i].eval( nt, ft )",args[i].eval( nt, ft )
 			newContext[ self.parList[i] ] = args[i].eval( nt, ft )
 
 		# evaluate the function body using the new name table and the old (only)

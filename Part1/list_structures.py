@@ -112,6 +112,8 @@ class Cdr( Expr ) :
 		if not isinstance(L, list):
 			raise Exception( "Argument must be a list")
 			#return
+		if len(L) == 1 :
+			return []
 		try:
 			return L[1:]
 		except:

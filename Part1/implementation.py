@@ -140,8 +140,7 @@ def p_program( p ) :
 
 def p_stmt_list( p ) :
 	'''stmt_list : stmt SEMICOLON stmt_list
-       | stmt
-	   | SEMICOLON'''
+       | stmt'''
 	
 	if len( p ) == 2 :  # single stmt => new list
 		p[0] = StmtList()
@@ -239,7 +238,7 @@ def p_error( p ):
 ########################### was in list implementation #############################3
 
 def p_concat( p ) :
-	'expr : expr CONCAT expr'
+	'expr : expr CONCAT list'
 	p[0] = Concat( p[1], p[3] )
 
 def p_list( p ) :
@@ -266,12 +265,12 @@ def p_list_element_element( p ):
 	'list_element : expr'
 	p[0] = p[1]
 	#print "toexpr", p[0]
-
+'''
 def p_element_list( p ):
 	'list_element : list'
 	p[0] = p[1]
 	#print " tolist", p[0]
-	
+	'''
 def p_expr_to_list( p ):
 	'expr : list'
 	p[0] = p[1]
