@@ -1,15 +1,12 @@
-define iterativelength proc (l)
+define iterativelength proc (li)
 	c:=0;
-	while listp(l) do 
-		l:=car(l);
-		c:=c+1;
+	a:=1;
+	while a do 
+		li:=cdr(li);
+		a:=1-nullp(li);
+		c:=c+1		 
 	od;
+	return:=c 
 end;
-
-
-
-
-
-
-
-
+test:=[1,2,3,5];
+testlen:=iterativelength(test)

@@ -140,8 +140,7 @@ def p_program( p ) :
 
 def p_stmt_list( p ) :
 	'''stmt_list : stmt SEMICOLON stmt_list
-       | stmt
-	   | SEMICOLON'''
+       | stmt'''
 	
 	if len( p ) == 2 :  # single stmt => new list
 		p[0] = StmtList()
