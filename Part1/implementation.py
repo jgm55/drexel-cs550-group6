@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/python
 #
 #	A python implementation of the mini language, with user-defined
@@ -131,7 +129,6 @@ import ply.yacc as yacc
 
 def p_program( p ) :
 	'program : stmt_list'
-	print "PROGRAM"
 	P = Program( p[1] )
 	#P.display()
 	print 'Running Program'
@@ -194,8 +191,8 @@ def p_fact_NUM( p ) :
 	p[0] = Number( p[1] )
 
 def p_fact_IDENT( p ) :
-	'fact : IDENT'
-	p[0] = Ident( p[1] )
+	'fact : d_ident'
+	p[0] = p[1]
 
 def p_fact_funcall( p ) :
 	'fact : func_call'
@@ -236,9 +233,15 @@ def p_error( p ):
 	sys.exit( 2 )
 	
 ########################### was in list implementation #############################3
-
+def p_def_ident( p ):
+	'd_ident : IDENT'
+	p[0]=Ident(p[1])
 def p_concat( p ) :
 	'expr : expr CONCAT list'
+	p[0] = Concat( p[1], p[3] )
+	
+def p_concat_id( p ) :
+	'expr : expr CONCAT d_ident'
 	p[0] = Concat( p[1], p[3] )
 
 def p_list( p ) :
@@ -276,27 +279,27 @@ def p_expr_to_list( p ):
 	p[0] = p[1]
 
 def p_func_call_cons( p ):
-	'func_call : CONS LPAREN IDENT COMMA IDENT RPAREN'
+	'func_call : CONS LPAREN expr COMMA expr RPAREN'
 	p[0] = Cons(p[3],p[5])
 
 def p_func_call_car( p ):
-	'func_call : CAR LPAREN IDENT RPAREN'
+	'func_call : CAR LPAREN expr RPAREN'
 	p[0] = Car(p[3])
 
 def p_func_call_cdr( p ):
-	'func_call : CDR LPAREN IDENT RPAREN'
+	'func_call : CDR LPAREN expr RPAREN'
 	p[0] = Cdr(p[3])
 
 def p_func_call_nullp( p ):
-	'func_call : NULLP LPAREN IDENT RPAREN'
+	'func_call : NULLP LPAREN expr RPAREN'
 	p[0] = Nullp(p[3])
 
 def p_func_call_intp( p ):
-	'func_call : INTP LPAREN IDENT RPAREN'
+	'func_call : INTP LPAREN expr RPAREN'
 	p[0] = Nullp(p[3])
 
 def p_func_call_listp( p ):
-	'func_call : LISTP LPAREN IDENT RPAREN' # was list_elem
+	'func_call : LISTP LPAREN expr RPAREN' # was list_elem
 	p[0] = Listp(p[3])
 
  ##############################################

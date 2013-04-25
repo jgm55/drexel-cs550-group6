@@ -319,7 +319,6 @@ class Program :
 		for k in self.funcTable :
 			print "  %s" % str(k)
 		print ""
-		self.display()
 
 	def display( self, depth=0 ) :
 		#print "%sPROGRAM :" % (tabstop*depth)
