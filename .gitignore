@@ -161,3 +161,7 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+# ply
+parser.out
+parsetab.py
