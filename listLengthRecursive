@@ -1,0 +1,9 @@
+define recursivelength proc (li)
+	if( nullp(li)) then  
+		return:=0  
+	else 
+		return:=1+recursivelength (cdr(li)) 
+	fi  
+end;
+test:=[1,2,3,5];
+testlen:=recursivelength(test)

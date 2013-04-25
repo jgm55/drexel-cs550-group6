@@ -6,6 +6,7 @@
 
 import structures
 from structures import Expr
+from structures import Ident
 
 tabstop = '  ' # 2 spaces
 
@@ -13,8 +14,6 @@ class Concat( Expr ):
 	'''expression for concating two lists'''
 
 	def __init__(self, lhs, rhs ) :
-		if not isinstance(lhs, List) or not isinstance(rhs, List):
-			raise Exception("Operation only applies to lists")
 		self.lhs = lhs
 		self.rhs = rhs
 
@@ -48,7 +47,10 @@ class List( Element ) :
 		self.contents = v
 
 	def eval( self, nt, ft ) :
-		return self.contents
+		self.eval_contents = []
+		for i in self.contents:
+		    self.eval_contents.append(i.eval(nt, ft))
+		return self.eval_contents
 
 	def display( self, nt, ft, depth=0) :
 		if len(self.contents) < 1:
@@ -81,7 +83,7 @@ class Car( Expr ) :
 		self.label = v
 		
 	def eval( self, nt, ft ) :	
-		L = nt[ self.label ]
+		L = self.label.eval(nt,ft)
 	
 		if not isinstance(L, list):
 			raise Exception( "Argument must be a list")
@@ -94,7 +96,7 @@ class Car( Expr ) :
 			#raise exception
 	
 	def display( self, nt, ft, depth=0 ) :
-		L = nt[ self.label ]
+		L = self.label.eval(nt,ft)
 		try:
 			if len(L) > 0:
 				L[0].display( nt, ft, depth)
@@ -108,7 +110,7 @@ class Cdr( Expr ) :
 		
 	def eval( self, nt, ft ) :	
 		''' returns the rest of the list (minus the first element) '''
-		L = nt[ self.label ]
+		L = self.label.eval(nt,ft)
 		if not isinstance(L, list):
 			raise Exception( "Argument must be a list")
 			#return
@@ -120,7 +122,7 @@ class Cdr( Expr ) :
 			raise Exception( "There are less than two elements in the list.")
 		
 	def display( self, nt, ft, depth=0 ) :
-		L = nt[ self.label ]
+		L = self.label.eval(nt,ft)
 		for i in range(1, len(L)):
 			L[i].display( nt, ft, depth)
 
@@ -134,8 +136,8 @@ class Cons( Expr ) :
 	def eval( self, nt, ft ) :	
 		'''returns a new list, with element e prepended to the front of list L '''
 		
-		e = nt[ self.label_e ]
-		L = nt[ self.label_l ]
+		e = self.label_e.eval(nt,ft)
+		L = self.label_l.eval(nt,ft)
 		#print "e",e,type(e)
 		#print "L",L,type(L)
 		#print "L[0]",L[0],type(L[0])
@@ -146,8 +148,8 @@ class Cons( Expr ) :
 		return C
 		
 	def display( self, nt, ft, depth=0 ) :
-		e = nt[ self.label_e ]
-		L = nt[ self.label_l ]
+		e = self.label_e.eval(nt,ft)
+		L = self.label_l.eval(nt,ft)
 		if isinstance(e, list):
 			for i in e:
 				i.display( nt, ft, depth+1 )
@@ -168,7 +170,7 @@ class Nullp( Expr ) :
 		
 	def eval( self, nt, ft ) :	
 		''' returns 1 if L is null, 0 otherwise '''
-		L = nt[ self.label ]
+		L = self.label.eval(nt,ft)
 		if not isinstance(L, list):
 			raise Exception( "Argument must be a list")
 		if len(L) > 0:
@@ -190,13 +192,14 @@ class Intp( Expr ) :
 		
 	def eval( self, nt, ft ) :	
 		'''returns 1 if e is an integer, 0 otherwise '''
-		e = nt[ self.label ]
+		
+		e = self.label.eval(nt,ft)
 		if isinstance(e,int) :
 			return 1
 		return 0
 		
 	def display( self, nt, ft, depth=0 ) :
-		e = nt[ self.label ]
+		e = self.label.eval(nt,ft)
 		if isinstance(e,int) :
 			print "%s%i" % (tabstop*depth, 1)
 		else:
@@ -210,13 +213,13 @@ class Listp( Expr ) :
 		
 	def eval( self, nt, ft ) :	
 		'''returns 1 if e is a list, 0 otherwise'''
-		e = nt[ self.label ]
+		e = self.label.eval(nt,ft)
 		if isinstance(e,list):
 			return 1
 		return 0
 		
 	def display( self, nt, ft, depth=0 ) :
-		e = nt[ self.label ]
+		e = self.label.eval(nt,ft)
 		if isinstance(e,list):
 			print "%s%i" % (tabstop*depth, 1)
 		else:
