@@ -9,6 +9,85 @@ from structures import Expr
 tabstop = '  '  # 2 spaces
 
 
+class ListCell:
+    """Cell in a list memory. Has an element (int or pointer to another list)
+       and a link to the next cell in the list. Also contains a bit supporting
+       mark-and-sweep garbage collection."""
+    def __init__(self, car=0, cdr=-1, ptr=False, mark=False):
+        self.car = car
+        self.cdr = cdr
+        self.ptr = ptr
+        self.mark = mark
+        pass
+
+    def update(self, car, cdr, ptr=False):
+        self.car = car
+        self.cdr = cdr
+        self.ptr = ptr
+
+    def str(self):
+        ptr = ""
+        mark = ""
+        if self.ptr:
+            ptr = "*"
+        if self.mark:
+            mark = "X"
+        return str(self.car) + ptr + ", " + str(self.cdr) + " " + mark
+
+
+class ListMemory:
+    """Dynamic memory for lists with mark and sweep garbage collection"""
+    def __init__(self, size):
+        self.size = size
+        self.cells = []
+        self.avail = 0
+
+        # Build memory
+        for i in range(size):
+            cdr = i+1
+            self.cells.append(ListCell(0, cdr))
+
+        # Set cdr of last cell
+        self.cells[-1].cdr = -1
+
+    def cons(self, car, cdr):
+        if self.avail >= 0:
+            idx = self.avail
+            self.avail = self.cells[idx].cdr
+        else:
+            print "Garbage collect TODO"
+            idx = -1
+
+        # car/cdr are tuples of the form (car,ptr) where ptr is a boolean
+        self.cells[idx].update(car[0], cdr[0], car[1])
+        return idx, True
+
+    def car(self, idx):
+        return self.cells[idx]
+
+    def str(self):
+        out = ""
+        out += "Cells:\n"
+        for i in range(len(self.cells)):
+            out += str(i) + ": " + self.cells[i].str() + "\n"
+        out += "Available: " + str(self.avail)
+        return out
+
+
+mem = ListMemory(8)
+
+
+def test_memory():
+    print mem.str()
+    print "cons((20,False), -1)"
+    mem.cons((20, False), (-1,False))
+    print mem.str()
+    print "cons((0,True), -1)"
+    mem.cons((0, True), (-1,False))
+    print "cons(cons(33,False)), -1)"
+    mem.cons(mem.cons((33, False), (-1, False)), mem.cons((55, False), (-1, False)))
+    print mem.str()
+
 class Concat(Expr):
     '''expression for concating two lists'''
 
@@ -235,3 +314,7 @@ class Listp(Expr):
             print "%s%i" % (tabstop * depth, 1)
         else:
             print "%s%i" % (tabstop * depth, 0)
+
+
+if __name__ == '__main__':
+    test_memory()
