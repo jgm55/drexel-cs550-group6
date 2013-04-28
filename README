@@ -1,0 +1,18 @@
+Joe Muoio
+Ryan Daugherty
+Tom Houman
+
+
+To run our parser use the following makefile commands:
+
+	make view-part1 : views all the python files associated with part 1
+	make view-part2 : views all the python files associated with part 2 
+	make build : sort of useless, since we are using python
+	
+	run-part1 : runs the parser for part 1
+	run-part2 : runs the parser for part 1
+	
+	view-func1 : views the function for iterative written for our parser
+	view-func2 : views the function for recursive written for our parser
+
+	clean : cleans all the useless generated files

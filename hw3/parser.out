@@ -1,0 +1,1836 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> stmt_list
+Rule 2     stmt_list -> stmt SEMICOLON stmt_list
+Rule 3     stmt_list -> stmt
+Rule 4     stmt -> assign_stmt
+Rule 5     stmt -> while_stmt
+Rule 6     stmt -> if_stmt
+Rule 7     expr -> expr PLUS term
+Rule 8     expr -> expr MINUS term
+Rule 9     expr_list -> expr COMMA expr_list
+Rule 10    expr_list -> expr
+Rule 11    expr -> term
+Rule 12    term -> term TIMES fact
+Rule 13    term -> fact
+Rule 14    fact -> LPAREN expr RPAREN
+Rule 15    fact -> NUMBER
+Rule 16    fact -> d_ident
+Rule 17    fact -> func_call
+Rule 18    assign_stmt -> IDENT ASSIGNOP expr
+Rule 19    while_stmt -> WHILE expr DO stmt_list OD
+Rule 20    if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI
+Rule 21    func_call -> IDENT LPAREN expr_list RPAREN
+Rule 22    d_ident -> IDENT
+Rule 23    expr -> expr CONCAT list
+Rule 24    expr -> expr CONCAT d_ident
+Rule 25    list -> LSQUARE sequence RSQUARE
+Rule 26    list -> LSQUARE RSQUARE
+Rule 27    sequence -> list_element COMMA sequence
+Rule 28    sequence -> list_element
+Rule 29    list_element -> expr
+Rule 30    expr -> list
+Rule 31    func_call -> CONS LPAREN expr COMMA expr RPAREN
+Rule 32    func_call -> CAR LPAREN expr RPAREN
+Rule 33    func_call -> CDR LPAREN expr RPAREN
+Rule 34    func_call -> NULLP LPAREN expr RPAREN
+Rule 35    func_call -> INTP LPAREN expr RPAREN
+Rule 36    func_call -> LISTP LPAREN expr RPAREN
+
+Terminals, with rules where they appear
+
+ASSIGNOP             : 18
+CAR                  : 32
+CDR                  : 33
+COMMA                : 9 27 31
+CONCAT               : 23 24
+CONS                 : 31
+DO                   : 19
+ELSE                 : 20
+FI                   : 20
+IDENT                : 18 21 22
+IF                   : 20
+INTP                 : 35
+LISTP                : 36
+LPAREN               : 14 21 31 32 33 34 35 36
+LSQUARE              : 25 26
+MINUS                : 8
+NULLP                : 34
+NUMBER               : 15
+OD                   : 19
+PLUS                 : 7
+RPAREN               : 14 21 31 32 33 34 35 36
+RSQUARE              : 25 26
+SEMICOLON            : 2
+THEN                 : 20
+TIMES                : 12
+WHILE                : 19
+error                : 
+
+Nonterminals, with rules where they appear
+
+assign_stmt          : 4
+d_ident              : 16 24
+expr                 : 7 8 9 10 14 18 19 20 23 24 29 31 31 32 33 34 35 36
+expr_list            : 9 21
+fact                 : 12 13
+func_call            : 17
+if_stmt              : 6
+list                 : 23 30
+list_element         : 27 28
+program              : 0
+sequence             : 25 27
+stmt                 : 2 3
+stmt_list            : 1 2 19 20 20
+term                 : 7 8 11 12
+while_stmt           : 5
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . stmt_list
+    (2) stmt_list -> . stmt SEMICOLON stmt_list
+    (3) stmt_list -> . stmt
+    (4) stmt -> . assign_stmt
+    (5) stmt -> . while_stmt
+    (6) stmt -> . if_stmt
+    (18) assign_stmt -> . IDENT ASSIGNOP expr
+    (19) while_stmt -> . WHILE expr DO stmt_list OD
+    (20) if_stmt -> . IF expr THEN stmt_list ELSE stmt_list FI
+
+    IDENT           shift and go to state 2
+    WHILE           shift and go to state 4
+    IF              shift and go to state 9
+
+    stmt_list                      shift and go to state 1
+    if_stmt                        shift and go to state 3
+    stmt                           shift and go to state 5
+    assign_stmt                    shift and go to state 6
+    while_stmt                     shift and go to state 7
+    program                        shift and go to state 8
+
+state 1
+
+    (1) program -> stmt_list .
+
+    $end            reduce using rule 1 (program -> stmt_list .)
+
+
+state 2
+
+    (18) assign_stmt -> IDENT . ASSIGNOP expr
+
+    ASSIGNOP        shift and go to state 10
+
+
+state 3
+
+    (6) stmt -> if_stmt .
+
+    SEMICOLON       reduce using rule 6 (stmt -> if_stmt .)
+    ELSE            reduce using rule 6 (stmt -> if_stmt .)
+    OD              reduce using rule 6 (stmt -> if_stmt .)
+    FI              reduce using rule 6 (stmt -> if_stmt .)
+    $end            reduce using rule 6 (stmt -> if_stmt .)
+
+
+state 4
+
+    (19) while_stmt -> WHILE . expr DO stmt_list OD
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 21
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 5
+
+    (2) stmt_list -> stmt . SEMICOLON stmt_list
+    (3) stmt_list -> stmt .
+
+    SEMICOLON       shift and go to state 27
+    $end            reduce using rule 3 (stmt_list -> stmt .)
+    OD              reduce using rule 3 (stmt_list -> stmt .)
+    ELSE            reduce using rule 3 (stmt_list -> stmt .)
+    FI              reduce using rule 3 (stmt_list -> stmt .)
+
+
+state 6
+
+    (4) stmt -> assign_stmt .
+
+    SEMICOLON       reduce using rule 4 (stmt -> assign_stmt .)
+    ELSE            reduce using rule 4 (stmt -> assign_stmt .)
+    OD              reduce using rule 4 (stmt -> assign_stmt .)
+    FI              reduce using rule 4 (stmt -> assign_stmt .)
+    $end            reduce using rule 4 (stmt -> assign_stmt .)
+
+
+state 7
+
+    (5) stmt -> while_stmt .
+
+    SEMICOLON       reduce using rule 5 (stmt -> while_stmt .)
+    ELSE            reduce using rule 5 (stmt -> while_stmt .)
+    OD              reduce using rule 5 (stmt -> while_stmt .)
+    FI              reduce using rule 5 (stmt -> while_stmt .)
+    $end            reduce using rule 5 (stmt -> while_stmt .)
+
+
+state 8
+
+    (0) S' -> program .
+
+
+
+state 9
+
+    (20) if_stmt -> IF . expr THEN stmt_list ELSE stmt_list FI
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 28
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 10
+
+    (18) assign_stmt -> IDENT ASSIGNOP . expr
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 29
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 11
+
+    (31) func_call -> CONS . LPAREN expr COMMA expr RPAREN
+
+    LPAREN          shift and go to state 30
+
+
+state 12
+
+    (25) list -> LSQUARE . sequence RSQUARE
+    (26) list -> LSQUARE . RSQUARE
+    (27) sequence -> . list_element COMMA sequence
+    (28) sequence -> . list_element
+    (29) list_element -> . expr
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    RSQUARE         shift and go to state 32
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    list_element                   shift and go to state 33
+    term                           shift and go to state 20
+    sequence                       shift and go to state 31
+    expr                           shift and go to state 34
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 13
+
+    (15) fact -> NUMBER .
+
+    TIMES           reduce using rule 15 (fact -> NUMBER .)
+    RPAREN          reduce using rule 15 (fact -> NUMBER .)
+    PLUS            reduce using rule 15 (fact -> NUMBER .)
+    MINUS           reduce using rule 15 (fact -> NUMBER .)
+    CONCAT          reduce using rule 15 (fact -> NUMBER .)
+    THEN            reduce using rule 15 (fact -> NUMBER .)
+    DO              reduce using rule 15 (fact -> NUMBER .)
+    SEMICOLON       reduce using rule 15 (fact -> NUMBER .)
+    $end            reduce using rule 15 (fact -> NUMBER .)
+    OD              reduce using rule 15 (fact -> NUMBER .)
+    ELSE            reduce using rule 15 (fact -> NUMBER .)
+    FI              reduce using rule 15 (fact -> NUMBER .)
+    COMMA           reduce using rule 15 (fact -> NUMBER .)
+    RSQUARE         reduce using rule 15 (fact -> NUMBER .)
+
+
+state 14
+
+    (32) func_call -> CAR . LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 35
+
+
+state 15
+
+    (17) fact -> func_call .
+
+    TIMES           reduce using rule 17 (fact -> func_call .)
+    RPAREN          reduce using rule 17 (fact -> func_call .)
+    PLUS            reduce using rule 17 (fact -> func_call .)
+    MINUS           reduce using rule 17 (fact -> func_call .)
+    CONCAT          reduce using rule 17 (fact -> func_call .)
+    THEN            reduce using rule 17 (fact -> func_call .)
+    DO              reduce using rule 17 (fact -> func_call .)
+    SEMICOLON       reduce using rule 17 (fact -> func_call .)
+    $end            reduce using rule 17 (fact -> func_call .)
+    OD              reduce using rule 17 (fact -> func_call .)
+    ELSE            reduce using rule 17 (fact -> func_call .)
+    FI              reduce using rule 17 (fact -> func_call .)
+    COMMA           reduce using rule 17 (fact -> func_call .)
+    RSQUARE         reduce using rule 17 (fact -> func_call .)
+
+
+state 16
+
+    (22) d_ident -> IDENT .
+    (21) func_call -> IDENT . LPAREN expr_list RPAREN
+
+    TIMES           reduce using rule 22 (d_ident -> IDENT .)
+    COMMA           reduce using rule 22 (d_ident -> IDENT .)
+    PLUS            reduce using rule 22 (d_ident -> IDENT .)
+    MINUS           reduce using rule 22 (d_ident -> IDENT .)
+    CONCAT          reduce using rule 22 (d_ident -> IDENT .)
+    RPAREN          reduce using rule 22 (d_ident -> IDENT .)
+    RSQUARE         reduce using rule 22 (d_ident -> IDENT .)
+    DO              reduce using rule 22 (d_ident -> IDENT .)
+    THEN            reduce using rule 22 (d_ident -> IDENT .)
+    SEMICOLON       reduce using rule 22 (d_ident -> IDENT .)
+    $end            reduce using rule 22 (d_ident -> IDENT .)
+    OD              reduce using rule 22 (d_ident -> IDENT .)
+    ELSE            reduce using rule 22 (d_ident -> IDENT .)
+    FI              reduce using rule 22 (d_ident -> IDENT .)
+    LPAREN          shift and go to state 36
+
+
+state 17
+
+    (34) func_call -> NULLP . LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 37
+
+
+state 18
+
+    (35) func_call -> INTP . LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 38
+
+
+state 19
+
+    (14) fact -> LPAREN . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 39
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 20
+
+    (11) expr -> term .
+    (12) term -> term . TIMES fact
+
+    RPAREN          reduce using rule 11 (expr -> term .)
+    PLUS            reduce using rule 11 (expr -> term .)
+    MINUS           reduce using rule 11 (expr -> term .)
+    CONCAT          reduce using rule 11 (expr -> term .)
+    SEMICOLON       reduce using rule 11 (expr -> term .)
+    $end            reduce using rule 11 (expr -> term .)
+    OD              reduce using rule 11 (expr -> term .)
+    ELSE            reduce using rule 11 (expr -> term .)
+    FI              reduce using rule 11 (expr -> term .)
+    COMMA           reduce using rule 11 (expr -> term .)
+    THEN            reduce using rule 11 (expr -> term .)
+    RSQUARE         reduce using rule 11 (expr -> term .)
+    DO              reduce using rule 11 (expr -> term .)
+    TIMES           shift and go to state 40
+
+
+state 21
+
+    (19) while_stmt -> WHILE expr . DO stmt_list OD
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    DO              shift and go to state 41
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 22
+
+    (30) expr -> list .
+
+    RPAREN          reduce using rule 30 (expr -> list .)
+    PLUS            reduce using rule 30 (expr -> list .)
+    MINUS           reduce using rule 30 (expr -> list .)
+    CONCAT          reduce using rule 30 (expr -> list .)
+    SEMICOLON       reduce using rule 30 (expr -> list .)
+    $end            reduce using rule 30 (expr -> list .)
+    OD              reduce using rule 30 (expr -> list .)
+    ELSE            reduce using rule 30 (expr -> list .)
+    FI              reduce using rule 30 (expr -> list .)
+    COMMA           reduce using rule 30 (expr -> list .)
+    THEN            reduce using rule 30 (expr -> list .)
+    RSQUARE         reduce using rule 30 (expr -> list .)
+    DO              reduce using rule 30 (expr -> list .)
+
+
+state 23
+
+    (36) func_call -> LISTP . LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 45
+
+
+state 24
+
+    (33) func_call -> CDR . LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 46
+
+
+state 25
+
+    (16) fact -> d_ident .
+
+    TIMES           reduce using rule 16 (fact -> d_ident .)
+    RPAREN          reduce using rule 16 (fact -> d_ident .)
+    PLUS            reduce using rule 16 (fact -> d_ident .)
+    MINUS           reduce using rule 16 (fact -> d_ident .)
+    CONCAT          reduce using rule 16 (fact -> d_ident .)
+    THEN            reduce using rule 16 (fact -> d_ident .)
+    DO              reduce using rule 16 (fact -> d_ident .)
+    SEMICOLON       reduce using rule 16 (fact -> d_ident .)
+    $end            reduce using rule 16 (fact -> d_ident .)
+    OD              reduce using rule 16 (fact -> d_ident .)
+    ELSE            reduce using rule 16 (fact -> d_ident .)
+    FI              reduce using rule 16 (fact -> d_ident .)
+    COMMA           reduce using rule 16 (fact -> d_ident .)
+    RSQUARE         reduce using rule 16 (fact -> d_ident .)
+
+
+state 26
+
+    (13) term -> fact .
+
+    TIMES           reduce using rule 13 (term -> fact .)
+    RPAREN          reduce using rule 13 (term -> fact .)
+    PLUS            reduce using rule 13 (term -> fact .)
+    MINUS           reduce using rule 13 (term -> fact .)
+    CONCAT          reduce using rule 13 (term -> fact .)
+    DO              reduce using rule 13 (term -> fact .)
+    THEN            reduce using rule 13 (term -> fact .)
+    SEMICOLON       reduce using rule 13 (term -> fact .)
+    $end            reduce using rule 13 (term -> fact .)
+    OD              reduce using rule 13 (term -> fact .)
+    ELSE            reduce using rule 13 (term -> fact .)
+    FI              reduce using rule 13 (term -> fact .)
+    COMMA           reduce using rule 13 (term -> fact .)
+    RSQUARE         reduce using rule 13 (term -> fact .)
+
+
+state 27
+
+    (2) stmt_list -> stmt SEMICOLON . stmt_list
+    (2) stmt_list -> . stmt SEMICOLON stmt_list
+    (3) stmt_list -> . stmt
+    (4) stmt -> . assign_stmt
+    (5) stmt -> . while_stmt
+    (6) stmt -> . if_stmt
+    (18) assign_stmt -> . IDENT ASSIGNOP expr
+    (19) while_stmt -> . WHILE expr DO stmt_list OD
+    (20) if_stmt -> . IF expr THEN stmt_list ELSE stmt_list FI
+
+    IDENT           shift and go to state 2
+    WHILE           shift and go to state 4
+    IF              shift and go to state 9
+
+    stmt_list                      shift and go to state 47
+    if_stmt                        shift and go to state 3
+    stmt                           shift and go to state 5
+    assign_stmt                    shift and go to state 6
+    while_stmt                     shift and go to state 7
+
+state 28
+
+    (20) if_stmt -> IF expr . THEN stmt_list ELSE stmt_list FI
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    THEN            shift and go to state 48
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 29
+
+    (18) assign_stmt -> IDENT ASSIGNOP expr .
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    SEMICOLON       reduce using rule 18 (assign_stmt -> IDENT ASSIGNOP expr .)
+    $end            reduce using rule 18 (assign_stmt -> IDENT ASSIGNOP expr .)
+    OD              reduce using rule 18 (assign_stmt -> IDENT ASSIGNOP expr .)
+    ELSE            reduce using rule 18 (assign_stmt -> IDENT ASSIGNOP expr .)
+    FI              reduce using rule 18 (assign_stmt -> IDENT ASSIGNOP expr .)
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 30
+
+    (31) func_call -> CONS LPAREN . expr COMMA expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 49
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 31
+
+    (25) list -> LSQUARE sequence . RSQUARE
+
+    RSQUARE         shift and go to state 50
+
+
+state 32
+
+    (26) list -> LSQUARE RSQUARE .
+
+    PLUS            reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    MINUS           reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    CONCAT          reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    SEMICOLON       reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    $end            reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    OD              reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    ELSE            reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    FI              reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    THEN            reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    DO              reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    COMMA           reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    RSQUARE         reduce using rule 26 (list -> LSQUARE RSQUARE .)
+    RPAREN          reduce using rule 26 (list -> LSQUARE RSQUARE .)
+
+
+state 33
+
+    (27) sequence -> list_element . COMMA sequence
+    (28) sequence -> list_element .
+
+    COMMA           shift and go to state 51
+    RSQUARE         reduce using rule 28 (sequence -> list_element .)
+
+
+state 34
+
+    (29) list_element -> expr .
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    COMMA           reduce using rule 29 (list_element -> expr .)
+    RSQUARE         reduce using rule 29 (list_element -> expr .)
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 35
+
+    (32) func_call -> CAR LPAREN . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 52
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 36
+
+    (21) func_call -> IDENT LPAREN . expr_list RPAREN
+    (9) expr_list -> . expr COMMA expr_list
+    (10) expr_list -> . expr
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr_list                      shift and go to state 53
+    list                           shift and go to state 22
+    expr                           shift and go to state 54
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 37
+
+    (34) func_call -> NULLP LPAREN . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 55
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 38
+
+    (35) func_call -> INTP LPAREN . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 56
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 39
+
+    (14) fact -> LPAREN expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 57
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 40
+
+    (12) term -> term TIMES . fact
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 58
+
+state 41
+
+    (19) while_stmt -> WHILE expr DO . stmt_list OD
+    (2) stmt_list -> . stmt SEMICOLON stmt_list
+    (3) stmt_list -> . stmt
+    (4) stmt -> . assign_stmt
+    (5) stmt -> . while_stmt
+    (6) stmt -> . if_stmt
+    (18) assign_stmt -> . IDENT ASSIGNOP expr
+    (19) while_stmt -> . WHILE expr DO stmt_list OD
+    (20) if_stmt -> . IF expr THEN stmt_list ELSE stmt_list FI
+
+    IDENT           shift and go to state 2
+    WHILE           shift and go to state 4
+    IF              shift and go to state 9
+
+    stmt_list                      shift and go to state 59
+    if_stmt                        shift and go to state 3
+    stmt                           shift and go to state 5
+    assign_stmt                    shift and go to state 6
+    while_stmt                     shift and go to state 7
+
+state 42
+
+    (7) expr -> expr PLUS . term
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 60
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 43
+
+    (8) expr -> expr MINUS . term
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 61
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 44
+
+    (23) expr -> expr CONCAT . list
+    (24) expr -> expr CONCAT . d_ident
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (22) d_ident -> . IDENT
+
+    LSQUARE         shift and go to state 12
+    IDENT           shift and go to state 62
+
+    d_ident                        shift and go to state 64
+    list                           shift and go to state 63
+
+state 45
+
+    (36) func_call -> LISTP LPAREN . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 65
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 46
+
+    (33) func_call -> CDR LPAREN . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 66
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 47
+
+    (2) stmt_list -> stmt SEMICOLON stmt_list .
+
+    $end            reduce using rule 2 (stmt_list -> stmt SEMICOLON stmt_list .)
+    OD              reduce using rule 2 (stmt_list -> stmt SEMICOLON stmt_list .)
+    ELSE            reduce using rule 2 (stmt_list -> stmt SEMICOLON stmt_list .)
+    FI              reduce using rule 2 (stmt_list -> stmt SEMICOLON stmt_list .)
+
+
+state 48
+
+    (20) if_stmt -> IF expr THEN . stmt_list ELSE stmt_list FI
+    (2) stmt_list -> . stmt SEMICOLON stmt_list
+    (3) stmt_list -> . stmt
+    (4) stmt -> . assign_stmt
+    (5) stmt -> . while_stmt
+    (6) stmt -> . if_stmt
+    (18) assign_stmt -> . IDENT ASSIGNOP expr
+    (19) while_stmt -> . WHILE expr DO stmt_list OD
+    (20) if_stmt -> . IF expr THEN stmt_list ELSE stmt_list FI
+
+    IDENT           shift and go to state 2
+    WHILE           shift and go to state 4
+    IF              shift and go to state 9
+
+    stmt_list                      shift and go to state 67
+    if_stmt                        shift and go to state 3
+    stmt                           shift and go to state 5
+    assign_stmt                    shift and go to state 6
+    while_stmt                     shift and go to state 7
+
+state 49
+
+    (31) func_call -> CONS LPAREN expr . COMMA expr RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    COMMA           shift and go to state 68
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 50
+
+    (25) list -> LSQUARE sequence RSQUARE .
+
+    PLUS            reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    MINUS           reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    CONCAT          reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    SEMICOLON       reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    $end            reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    OD              reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    ELSE            reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    FI              reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    THEN            reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    DO              reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    COMMA           reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    RSQUARE         reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+    RPAREN          reduce using rule 25 (list -> LSQUARE sequence RSQUARE .)
+
+
+state 51
+
+    (27) sequence -> list_element COMMA . sequence
+    (27) sequence -> . list_element COMMA sequence
+    (28) sequence -> . list_element
+    (29) list_element -> . expr
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    list_element                   shift and go to state 33
+    term                           shift and go to state 20
+    sequence                       shift and go to state 69
+    expr                           shift and go to state 34
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 52
+
+    (32) func_call -> CAR LPAREN expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 70
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 53
+
+    (21) func_call -> IDENT LPAREN expr_list . RPAREN
+
+    RPAREN          shift and go to state 71
+
+
+state 54
+
+    (9) expr_list -> expr . COMMA expr_list
+    (10) expr_list -> expr .
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    COMMA           shift and go to state 72
+    RPAREN          reduce using rule 10 (expr_list -> expr .)
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 55
+
+    (34) func_call -> NULLP LPAREN expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 73
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 56
+
+    (35) func_call -> INTP LPAREN expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 74
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 57
+
+    (14) fact -> LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    PLUS            reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    MINUS           reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    CONCAT          reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    THEN            reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    DO              reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    SEMICOLON       reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    $end            reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    OD              reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    ELSE            reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    FI              reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    COMMA           reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+    RSQUARE         reduce using rule 14 (fact -> LPAREN expr RPAREN .)
+
+
+state 58
+
+    (12) term -> term TIMES fact .
+
+    TIMES           reduce using rule 12 (term -> term TIMES fact .)
+    RPAREN          reduce using rule 12 (term -> term TIMES fact .)
+    PLUS            reduce using rule 12 (term -> term TIMES fact .)
+    MINUS           reduce using rule 12 (term -> term TIMES fact .)
+    CONCAT          reduce using rule 12 (term -> term TIMES fact .)
+    DO              reduce using rule 12 (term -> term TIMES fact .)
+    THEN            reduce using rule 12 (term -> term TIMES fact .)
+    SEMICOLON       reduce using rule 12 (term -> term TIMES fact .)
+    $end            reduce using rule 12 (term -> term TIMES fact .)
+    OD              reduce using rule 12 (term -> term TIMES fact .)
+    ELSE            reduce using rule 12 (term -> term TIMES fact .)
+    FI              reduce using rule 12 (term -> term TIMES fact .)
+    COMMA           reduce using rule 12 (term -> term TIMES fact .)
+    RSQUARE         reduce using rule 12 (term -> term TIMES fact .)
+
+
+state 59
+
+    (19) while_stmt -> WHILE expr DO stmt_list . OD
+
+    OD              shift and go to state 75
+
+
+state 60
+
+    (7) expr -> expr PLUS term .
+    (12) term -> term . TIMES fact
+
+    RPAREN          reduce using rule 7 (expr -> expr PLUS term .)
+    PLUS            reduce using rule 7 (expr -> expr PLUS term .)
+    MINUS           reduce using rule 7 (expr -> expr PLUS term .)
+    CONCAT          reduce using rule 7 (expr -> expr PLUS term .)
+    SEMICOLON       reduce using rule 7 (expr -> expr PLUS term .)
+    $end            reduce using rule 7 (expr -> expr PLUS term .)
+    OD              reduce using rule 7 (expr -> expr PLUS term .)
+    ELSE            reduce using rule 7 (expr -> expr PLUS term .)
+    FI              reduce using rule 7 (expr -> expr PLUS term .)
+    COMMA           reduce using rule 7 (expr -> expr PLUS term .)
+    THEN            reduce using rule 7 (expr -> expr PLUS term .)
+    RSQUARE         reduce using rule 7 (expr -> expr PLUS term .)
+    DO              reduce using rule 7 (expr -> expr PLUS term .)
+    TIMES           shift and go to state 40
+
+
+state 61
+
+    (8) expr -> expr MINUS term .
+    (12) term -> term . TIMES fact
+
+    RPAREN          reduce using rule 8 (expr -> expr MINUS term .)
+    PLUS            reduce using rule 8 (expr -> expr MINUS term .)
+    MINUS           reduce using rule 8 (expr -> expr MINUS term .)
+    CONCAT          reduce using rule 8 (expr -> expr MINUS term .)
+    SEMICOLON       reduce using rule 8 (expr -> expr MINUS term .)
+    $end            reduce using rule 8 (expr -> expr MINUS term .)
+    OD              reduce using rule 8 (expr -> expr MINUS term .)
+    ELSE            reduce using rule 8 (expr -> expr MINUS term .)
+    FI              reduce using rule 8 (expr -> expr MINUS term .)
+    COMMA           reduce using rule 8 (expr -> expr MINUS term .)
+    THEN            reduce using rule 8 (expr -> expr MINUS term .)
+    RSQUARE         reduce using rule 8 (expr -> expr MINUS term .)
+    DO              reduce using rule 8 (expr -> expr MINUS term .)
+    TIMES           shift and go to state 40
+
+
+state 62
+
+    (22) d_ident -> IDENT .
+
+    DO              reduce using rule 22 (d_ident -> IDENT .)
+    PLUS            reduce using rule 22 (d_ident -> IDENT .)
+    MINUS           reduce using rule 22 (d_ident -> IDENT .)
+    CONCAT          reduce using rule 22 (d_ident -> IDENT .)
+    THEN            reduce using rule 22 (d_ident -> IDENT .)
+    SEMICOLON       reduce using rule 22 (d_ident -> IDENT .)
+    $end            reduce using rule 22 (d_ident -> IDENT .)
+    OD              reduce using rule 22 (d_ident -> IDENT .)
+    ELSE            reduce using rule 22 (d_ident -> IDENT .)
+    FI              reduce using rule 22 (d_ident -> IDENT .)
+    COMMA           reduce using rule 22 (d_ident -> IDENT .)
+    RSQUARE         reduce using rule 22 (d_ident -> IDENT .)
+    RPAREN          reduce using rule 22 (d_ident -> IDENT .)
+
+
+state 63
+
+    (23) expr -> expr CONCAT list .
+
+    RPAREN          reduce using rule 23 (expr -> expr CONCAT list .)
+    PLUS            reduce using rule 23 (expr -> expr CONCAT list .)
+    MINUS           reduce using rule 23 (expr -> expr CONCAT list .)
+    CONCAT          reduce using rule 23 (expr -> expr CONCAT list .)
+    SEMICOLON       reduce using rule 23 (expr -> expr CONCAT list .)
+    $end            reduce using rule 23 (expr -> expr CONCAT list .)
+    OD              reduce using rule 23 (expr -> expr CONCAT list .)
+    ELSE            reduce using rule 23 (expr -> expr CONCAT list .)
+    FI              reduce using rule 23 (expr -> expr CONCAT list .)
+    COMMA           reduce using rule 23 (expr -> expr CONCAT list .)
+    THEN            reduce using rule 23 (expr -> expr CONCAT list .)
+    RSQUARE         reduce using rule 23 (expr -> expr CONCAT list .)
+    DO              reduce using rule 23 (expr -> expr CONCAT list .)
+
+
+state 64
+
+    (24) expr -> expr CONCAT d_ident .
+
+    RPAREN          reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    PLUS            reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    MINUS           reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    CONCAT          reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    SEMICOLON       reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    $end            reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    OD              reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    ELSE            reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    FI              reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    COMMA           reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    THEN            reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    RSQUARE         reduce using rule 24 (expr -> expr CONCAT d_ident .)
+    DO              reduce using rule 24 (expr -> expr CONCAT d_ident .)
+
+
+state 65
+
+    (36) func_call -> LISTP LPAREN expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 76
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 66
+
+    (33) func_call -> CDR LPAREN expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 77
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 67
+
+    (20) if_stmt -> IF expr THEN stmt_list . ELSE stmt_list FI
+
+    ELSE            shift and go to state 78
+
+
+state 68
+
+    (31) func_call -> CONS LPAREN expr COMMA . expr RPAREN
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 79
+    list                           shift and go to state 22
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 69
+
+    (27) sequence -> list_element COMMA sequence .
+
+    RSQUARE         reduce using rule 27 (sequence -> list_element COMMA sequence .)
+
+
+state 70
+
+    (32) func_call -> CAR LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    PLUS            reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    MINUS           reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    CONCAT          reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    SEMICOLON       reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    $end            reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    OD              reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    ELSE            reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    FI              reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    COMMA           reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    DO              reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    RSQUARE         reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+    THEN            reduce using rule 32 (func_call -> CAR LPAREN expr RPAREN .)
+
+
+state 71
+
+    (21) func_call -> IDENT LPAREN expr_list RPAREN .
+
+    TIMES           reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    RPAREN          reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    PLUS            reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    MINUS           reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    CONCAT          reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    SEMICOLON       reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    $end            reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    OD              reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    ELSE            reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    FI              reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    COMMA           reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    DO              reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    RSQUARE         reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+    THEN            reduce using rule 21 (func_call -> IDENT LPAREN expr_list RPAREN .)
+
+
+state 72
+
+    (9) expr_list -> expr COMMA . expr_list
+    (9) expr_list -> . expr COMMA expr_list
+    (10) expr_list -> . expr
+    (7) expr -> . expr PLUS term
+    (8) expr -> . expr MINUS term
+    (11) expr -> . term
+    (23) expr -> . expr CONCAT list
+    (24) expr -> . expr CONCAT d_ident
+    (30) expr -> . list
+    (12) term -> . term TIMES fact
+    (13) term -> . fact
+    (25) list -> . LSQUARE sequence RSQUARE
+    (26) list -> . LSQUARE RSQUARE
+    (14) fact -> . LPAREN expr RPAREN
+    (15) fact -> . NUMBER
+    (16) fact -> . d_ident
+    (17) fact -> . func_call
+    (22) d_ident -> . IDENT
+    (21) func_call -> . IDENT LPAREN expr_list RPAREN
+    (31) func_call -> . CONS LPAREN expr COMMA expr RPAREN
+    (32) func_call -> . CAR LPAREN expr RPAREN
+    (33) func_call -> . CDR LPAREN expr RPAREN
+    (34) func_call -> . NULLP LPAREN expr RPAREN
+    (35) func_call -> . INTP LPAREN expr RPAREN
+    (36) func_call -> . LISTP LPAREN expr RPAREN
+
+    LSQUARE         shift and go to state 12
+    LPAREN          shift and go to state 19
+    NUMBER          shift and go to state 13
+    IDENT           shift and go to state 16
+    CONS            shift and go to state 11
+    CAR             shift and go to state 14
+    CDR             shift and go to state 24
+    NULLP           shift and go to state 17
+    INTP            shift and go to state 18
+    LISTP           shift and go to state 23
+
+    func_call                      shift and go to state 15
+    term                           shift and go to state 20
+    expr                           shift and go to state 54
+    list                           shift and go to state 22
+    expr_list                      shift and go to state 80
+    d_ident                        shift and go to state 25
+    fact                           shift and go to state 26
+
+state 73
+
+    (34) func_call -> NULLP LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    PLUS            reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    MINUS           reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    CONCAT          reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    SEMICOLON       reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    $end            reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    OD              reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    ELSE            reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    FI              reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    COMMA           reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    DO              reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    RSQUARE         reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+    THEN            reduce using rule 34 (func_call -> NULLP LPAREN expr RPAREN .)
+
+
+state 74
+
+    (35) func_call -> INTP LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    PLUS            reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    MINUS           reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    CONCAT          reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    SEMICOLON       reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    $end            reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    OD              reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    ELSE            reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    FI              reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    COMMA           reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    DO              reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    RSQUARE         reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+    THEN            reduce using rule 35 (func_call -> INTP LPAREN expr RPAREN .)
+
+
+state 75
+
+    (19) while_stmt -> WHILE expr DO stmt_list OD .
+
+    SEMICOLON       reduce using rule 19 (while_stmt -> WHILE expr DO stmt_list OD .)
+    ELSE            reduce using rule 19 (while_stmt -> WHILE expr DO stmt_list OD .)
+    OD              reduce using rule 19 (while_stmt -> WHILE expr DO stmt_list OD .)
+    $end            reduce using rule 19 (while_stmt -> WHILE expr DO stmt_list OD .)
+    FI              reduce using rule 19 (while_stmt -> WHILE expr DO stmt_list OD .)
+
+
+state 76
+
+    (36) func_call -> LISTP LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    PLUS            reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    MINUS           reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    CONCAT          reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    SEMICOLON       reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    $end            reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    OD              reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    ELSE            reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    FI              reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    COMMA           reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    DO              reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    RSQUARE         reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+    THEN            reduce using rule 36 (func_call -> LISTP LPAREN expr RPAREN .)
+
+
+state 77
+
+    (33) func_call -> CDR LPAREN expr RPAREN .
+
+    TIMES           reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    PLUS            reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    MINUS           reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    CONCAT          reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    SEMICOLON       reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    $end            reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    OD              reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    ELSE            reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    FI              reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    COMMA           reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    DO              reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    RSQUARE         reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+    THEN            reduce using rule 33 (func_call -> CDR LPAREN expr RPAREN .)
+
+
+state 78
+
+    (20) if_stmt -> IF expr THEN stmt_list ELSE . stmt_list FI
+    (2) stmt_list -> . stmt SEMICOLON stmt_list
+    (3) stmt_list -> . stmt
+    (4) stmt -> . assign_stmt
+    (5) stmt -> . while_stmt
+    (6) stmt -> . if_stmt
+    (18) assign_stmt -> . IDENT ASSIGNOP expr
+    (19) while_stmt -> . WHILE expr DO stmt_list OD
+    (20) if_stmt -> . IF expr THEN stmt_list ELSE stmt_list FI
+
+    IDENT           shift and go to state 2
+    WHILE           shift and go to state 4
+    IF              shift and go to state 9
+
+    stmt_list                      shift and go to state 81
+    if_stmt                        shift and go to state 3
+    stmt                           shift and go to state 5
+    assign_stmt                    shift and go to state 6
+    while_stmt                     shift and go to state 7
+
+state 79
+
+    (31) func_call -> CONS LPAREN expr COMMA expr . RPAREN
+    (7) expr -> expr . PLUS term
+    (8) expr -> expr . MINUS term
+    (23) expr -> expr . CONCAT list
+    (24) expr -> expr . CONCAT d_ident
+
+    RPAREN          shift and go to state 82
+    PLUS            shift and go to state 42
+    MINUS           shift and go to state 43
+    CONCAT          shift and go to state 44
+
+
+state 80
+
+    (9) expr_list -> expr COMMA expr_list .
+
+    RPAREN          reduce using rule 9 (expr_list -> expr COMMA expr_list .)
+
+
+state 81
+
+    (20) if_stmt -> IF expr THEN stmt_list ELSE stmt_list . FI
+
+    FI              shift and go to state 83
+
+
+state 82
+
+    (31) func_call -> CONS LPAREN expr COMMA expr RPAREN .
+
+    TIMES           reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    RPAREN          reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    PLUS            reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    MINUS           reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    CONCAT          reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    SEMICOLON       reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    $end            reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    OD              reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    ELSE            reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    FI              reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    COMMA           reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    DO              reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    RSQUARE         reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+    THEN            reduce using rule 31 (func_call -> CONS LPAREN expr COMMA expr RPAREN .)
+
+
+state 83
+
+    (20) if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI .
+
+    SEMICOLON       reduce using rule 20 (if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI .)
+    OD              reduce using rule 20 (if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI .)
+    FI              reduce using rule 20 (if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI .)
+    ELSE            reduce using rule 20 (if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI .)
+    $end            reduce using rule 20 (if_stmt -> IF expr THEN stmt_list ELSE stmt_list FI .)
+

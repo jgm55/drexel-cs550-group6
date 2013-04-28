@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/python
 #
 #	A python implementation of the mini language, with user-defined
@@ -42,9 +40,6 @@ tokens = (
 	'THEN',
 	'ELSE',
 	'FI',
-	'DEFINE',
-	'PROC',
-	'END',
 	'IDENT',
 	'CONS',
 	'CDR',
@@ -63,9 +58,6 @@ reserved = {
 		'then'	: 'THEN',
 		'else'	: 'ELSE',
 		'fi'		: 'FI',
-		'define': 'DEFINE',
-		'proc'	: 'PROC',
-		'end'		: 'END',
 		'car' : 'CAR',
 		'cdr' : 'CDR',
 		'nullp' : 'NULLP',
@@ -131,17 +123,16 @@ import ply.yacc as yacc
 
 def p_program( p ) :
 	'program : stmt_list'
-	print "PROGRAM"
 	P = Program( p[1] )
 	#P.display()
 	print 'Running Program'
 	P.eval()
 	P.dump()
+	print P.translate()
 
 def p_stmt_list( p ) :
 	'''stmt_list : stmt SEMICOLON stmt_list
-       | stmt
-	   | SEMICOLON'''
+       | stmt'''
 	
 	if len( p ) == 2 :  # single stmt => new list
 		p[0] = StmtList()
@@ -153,8 +144,7 @@ def p_stmt_list( p ) :
 def p_stmt( p ) :
 	'''stmt : assign_stmt
 				| while_stmt
-				| if_stmt
-				| define_stmt'''
+				| if_stmt'''
 	p[0] = p[1]
 
 def p_add( p ) :
@@ -195,8 +185,8 @@ def p_fact_NUM( p ) :
 	p[0] = Number( p[1] )
 
 def p_fact_IDENT( p ) :
-	'fact : IDENT'
-	p[0] = Ident( p[1] )
+	'fact : d_ident'
+	p[0] = p[1]
 
 def p_fact_funcall( p ) :
 	'fact : func_call'
@@ -214,19 +204,6 @@ def p_if( p ) :
 	'if_stmt : IF expr THEN stmt_list ELSE stmt_list FI'
 	p[0] = IfStmt( p[2], p[4], p[6] )
 
-def p_def( p ) :
-  'define_stmt : DEFINE IDENT PROC LPAREN param_list RPAREN stmt_list END'
-  p[0] = DefineStmt( p[2], Proc( p[5], p[7] ))
-
-def p_param_list( p ) :
-  '''param_list : IDENT COMMA param_list
-              | IDENT'''
-  if len( p ) == 2 :  # single param => new list
-    p[0] = [ p[1] ]
-  else :  # we have a param_list, keep adding to front
-    p[3].insert( 0, p[1] )
-    p[0] = p[3]
-
 def p_func_call( p ) :
   'func_call : IDENT LPAREN expr_list RPAREN'
   p[0] = FunCall( p[1], p[3] )
@@ -237,9 +214,15 @@ def p_error( p ):
 	sys.exit( 2 )
 	
 ########################### was in list implementation #############################3
-
+def p_def_ident( p ):
+	'd_ident : IDENT'
+	p[0]=Ident(p[1])
 def p_concat( p ) :
-	'expr : expr CONCAT expr'
+	'expr : expr CONCAT list'
+	p[0] = Concat( p[1], p[3] )
+	
+def p_concat_id( p ) :
+	'expr : expr CONCAT d_ident'
 	p[0] = Concat( p[1], p[3] )
 
 def p_list( p ) :
@@ -266,38 +249,38 @@ def p_list_element_element( p ):
 	'list_element : expr'
 	p[0] = p[1]
 	#print "toexpr", p[0]
-
+'''
 def p_element_list( p ):
 	'list_element : list'
 	p[0] = p[1]
 	#print " tolist", p[0]
-	
+	'''
 def p_expr_to_list( p ):
 	'expr : list'
 	p[0] = p[1]
 
 def p_func_call_cons( p ):
-	'func_call : CONS LPAREN IDENT COMMA IDENT RPAREN'
+	'func_call : CONS LPAREN expr COMMA expr RPAREN'
 	p[0] = Cons(p[3],p[5])
 
 def p_func_call_car( p ):
-	'func_call : CAR LPAREN IDENT RPAREN'
+	'func_call : CAR LPAREN expr RPAREN'
 	p[0] = Car(p[3])
 
 def p_func_call_cdr( p ):
-	'func_call : CDR LPAREN IDENT RPAREN'
+	'func_call : CDR LPAREN expr RPAREN'
 	p[0] = Cdr(p[3])
 
 def p_func_call_nullp( p ):
-	'func_call : NULLP LPAREN IDENT RPAREN'
+	'func_call : NULLP LPAREN expr RPAREN'
 	p[0] = Nullp(p[3])
 
 def p_func_call_intp( p ):
-	'func_call : INTP LPAREN IDENT RPAREN'
+	'func_call : INTP LPAREN expr RPAREN'
 	p[0] = Nullp(p[3])
 
 def p_func_call_listp( p ):
-	'func_call : LISTP LPAREN IDENT RPAREN' # was list_elem
+	'func_call : LISTP LPAREN expr RPAREN' # was list_elem
 	p[0] = Listp(p[3])
 
  ##############################################
@@ -320,42 +303,11 @@ def test_scanner( arg=sys.argv ) :
 		print tok
 		tok = lex.token()
 
-#def initalize_builtins():
-#	'define_stmt : DEFINE IDENT PROC LPAREN param_list RPAREN stmt_list END'
-#	DefineStmt( 'car', Proc( 'L',  ))
-
 def test_parser( arg=sys.argv ) :
 
-	#data = ( '2', '232', '98237492' )
-	#data = [ '2+4', '2-4', '2*37' ]
-	#data.extend( [ 'x', 'foo', 'sof' ] )
-	#data = '''x:=3; s:=0; while x do s := s+x ; x := x-1 od'''
-	#data = '''x := 12;
-	#	if x then
-	#		y := 13
-	#	else
-	#		y := 0
-	#	fi'''
-
-	#data = 'if 5 then x := 13 else x:=0 fi'
-
-	#data = '''
-	#define sum ( i )
-	#proc
-	#  return := 0;
-	#	while i do
-	#		return := return + i;
-	#		i := i - 1
-	#	od
-	#done;
-	#x := 5;
-	#sum( x )'''
-	#initialize_builtins()
 	print "Please enter the program,  terminate with CTRL+D on a new line"
 
 	data = ""
-	
-	data 
 	
 	data += sys.stdin.read()
 

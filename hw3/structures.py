@@ -18,6 +18,10 @@ returnSymbol = 'return'
 
 tabstop = '  ' # 2 spaces
 
+#####  Globals    #################
+
+variableCounter = 0
+
 ######   CLASSES   ##################
 
 class Expr :
@@ -42,7 +46,11 @@ class Expr :
 		'For debugging.'
 		raise NotImplementedError(
 			'Expr.display: virtual method.  Must be overridden.' )
-
+	def translate( self, nt, ft ) :
+		'For debugging.'
+		raise NotImplementedError(
+			'Expr.translate: virtual method.  Must be overridden.' )
+	
 class Ident( Expr ) :
 	'''Stores the symbol'''
 
@@ -54,7 +62,15 @@ class Ident( Expr ) :
 
 	def display( self, nt, ft, depth=0 ) :
 		print "%s%s" % (tabstop*depth, self.name)
-
+	def translate( self, nt, ft ):
+		global variableCounter
+		
+		ntLookup = nt[ self.name].translate( nt, ft )
+		code = "LDA " + str(ntLookup)
+		code += "\nSTA t" + str(variableCounter) + "\n"
+		variableCounter += 1
+		
+		return code;
 
 class Times( Expr ) :
 	'''expression for binary multiplication'''
@@ -77,13 +93,30 @@ class Times( Expr ) :
 		self.lhs.display( nt, ft, depth+1 )
 		self.rhs.display( nt, ft, depth+1 )
 		#print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
-
+	def translate(self,nt,ft):
+		global variableCounter
+		
+		code = self.lhs.translate(nt,ft)
+		code += self.rhs.translate(nt,ft)
+		c = 0
+		code += "LD 0\n"
+		if self.lhs > self.rhs:
+			addr = "t"+str(variableCounter - 2)
+			lesserSide = self.rhs
+		else:
+			addr = "t"+str(variableCounter - 1) 
+			lesserSide = self.lhs
+		while c < lesserSide:
+			code += "ADD t" + addr + "\n"
+		code += "STA t" + str(variableCounter) + "\n"
+		variableCounter += 1
+		return code
 
 class Plus( Expr ) :
 	'''expression for binary addition'''
 
 	def __init__( self, lhs, rhs ) :
-		if isinstance(lhs, List) or isinstance(rhs, List):
+		if lhs.isList() or rhs.isList():
 			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
@@ -96,13 +129,23 @@ class Plus( Expr ) :
 		self.lhs.display( nt, ft, depth+1 )
 		self.rhs.display( nt, ft, depth+1 )
 		#print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
-
+	def translate(self,nt,ft):
+		#must call translate??
+		global variableCounter
+		
+		code = self.rhs.translate(nt,ft)
+		code += self.lhs.translate(nt,ft)
+		code += "LD t"+str(variableCounter - 2)
+		code += "\nADD t" + str(variableCounter - 1) + "\n"
+		code += "STA t" + str(variableCounter) + "\n"
+		variableCounter += 1
+		return code
 
 class Minus( Expr ) :
 	'''expression for binary subtraction'''
 
 	def __init__( self, lhs, rhs ) :
-		if isinstance(lhs, List) or isinstance(rhs, List):
+		if lhs.isList() or rhs.isList():
 			raise Exception("Operation cannot apply to lists")
 		self.lhs = lhs
 		self.rhs = rhs
@@ -115,7 +158,17 @@ class Minus( Expr ) :
 		self.lhs.display( nt, ft, depth+1 )
 		self.rhs.display( nt, ft, depth+1 )
 		#print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
-
+	def translate(self,nt,ft):
+		#must call translate??
+		global variableCounter
+		
+		code = self.rhs.translate(nt,ft)
+		code += self.lhs.translate(nt,ft)
+		code += "LD t"+str(variableCounter - 2) 
+		code += "\nSUB t" + str(int(variableCounter - 1)) + "\n"
+		code += "STA t" + str(variableCounter) + "\n"
+		variableCounter += 1
+		return code
 
 class FunCall( Expr ) :
 	'''stores a function call:
@@ -171,22 +224,9 @@ class AssignStmt( Stmt ) :
 	def display( self, nt, ft, depth=0 ) :
 		print "%sAssign: %s :=" % (tabstop*depth, self.name)
 		self.rhs.display( nt, ft, depth+1 )
-
-
-class DefineStmt( Stmt ) :
-	'''Binds a proc object to a name'''
-
-	def __init__( self, name, proc ) :
-		self.name = name
-		self.proc = proc
-
-	def eval( self, nt, ft ) :
-		ft[ self.name ] = self.proc
-
-	def display( self, nt, ft, depth=0 ) :
-		print "%sDEFINE %s :" % (tabstop*depth, self.name)
-		self.proc.display( nt, ft, depth+1 )
-
+	def translate( self, nt, ft ) :
+		#print "%sAssign: %s :=" % (tabstop*depth, self.name)
+		return self.rhs.translate( nt, ft )
 
 class IfStmt( Stmt ) :
 
@@ -250,53 +290,11 @@ class StmtList :
 		print "%sSTMT LIST" % (tabstop*depth)
 		for s in self.sl :
 			s.display( nt, ft, depth+1 )
-
-
-class Proc :
-	'''stores a procedure (formal params, and the body)
-
-	Note that, while each function gets its own environment, we decided not to
-	allow side-effects, so, no access to any outer contexts.  Thus, nesting
-	functions is legal, but no different than defining them all in the global
-	environment.  Further, all calls are handled the same way, regardless of
-	the calling environment (after the actual args are evaluated); the proc
-	doesn't need/want/get an outside environment.'''
-
-	def __init__( self, paramList, body ) :
-		'''expects a list of formal parameters (variables, as strings), and a
-		StmtList'''
-
-		self.parList = paramList
-		self.body = body
-
-	def apply( self, nt, ft, args ) :
-		newContext = {}
-
-		# sanity check, # of args
-		if len( args ) is not len( self.parList ) :
-			print "Param count does not match:"
-			sys.exit( 1 )
-
-		# bind parameters in new name table (the only things there right now)
-			# use zip, bastard
-		for i in range( len( args )) :
-			newContext[ self.parList[i] ] = args[i].eval( nt, ft )
-
-		# evaluate the function body using the new name table and the old (only)
-		# function table.  Note that the proc's return value is stored as
-		# 'return in its nametable
-
-		self.body.eval( newContext, ft )
-		if newContext.has_key( returnSymbol ) :
-			return newContext[ returnSymbol ]
-		else :
-			print "Error:  no return value"
-			sys.exit( 2 )
-	
-	def display( self, nt, ft, depth=0 ) :
-		print "%sPROC %s :" % (tabstop*depth, str(self.parList))
-		self.body.display( nt, ft, depth+1 )
-
+	def translate( self, nt, ft ):
+		code = ""
+		for s in self.sl :
+			code += s.translate( nt, ft )
+		return code
 
 class Program :
 	
@@ -317,9 +315,9 @@ class Program :
 		for k in self.funcTable :
 			print "  %s" % str(k)
 		print ""
-		self.display()
 
 	def display( self, depth=0 ) :
 		#print "%sPROGRAM :" % (tabstop*depth)
 		self.stmtList.display( self.nameTable, self.funcTable )
-
+	def translate(self):
+		return self.stmtList.translate( self.nameTable, self.funcTable )
