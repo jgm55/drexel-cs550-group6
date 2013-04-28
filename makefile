@@ -22,11 +22,11 @@ run-part1 : ./Part1/implementation.py ./Part1/list_implementation.py ./Part1/str
 run-part2 : ./Part2/implementation.py ./Part2/structures.py ./Part2/list_structures.py
 	python ./Part2/implementation.py
 
-view-func1 : 
-	echo ""
+view-func1 : listLengthIterative
+	more ./listLengthIterative
 
-view-func2 : 
-	echo ""
+view-func2 : listLengthRecursive
+	more ./listLengthRecursive
 
 clean :
 	@rm -f ./parsetab.py
