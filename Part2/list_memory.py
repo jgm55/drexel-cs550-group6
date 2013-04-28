@@ -64,34 +64,49 @@ class ListMemory:
         """Allocate a free block and return the element.
            Performs garbage collection no available blocks.
            If none available after GC, throws an error"""
-        if self.avail.isptr and self.avail.val >= 0:
-            avail = self.avail
-            self.avail = self.cells[avail.val].cdr
-        else:
+        if self.avail.isnull():
             # Garbage collection
             # Loop over all context and mark accessible lists
-            #for ctx in self.ctx:
-            #    for name, val in ctx:
-            #        if isinstance(val, ListElt):
-            #            self.mark(val)
-            #print "GC Mark Result:"
-            print "GC Not implemented. Memory:"
-            print str(self)
-            print "Context:"
+            for ctx in self.ctx:
+                for name, val in ctx.items():
+                    if isinstance(val, ListElt):
+                        self.mark(val)
+            print "GC Context:"
             print self.ctx
-            raise Exception("Garbage collect not implemented")
+            print "GC After Mark:"
+            print str(self)
+            self.sweep()
+            print "GC After Sweep:"
+            print str(self)
 
-        self.cells[avail.val].update(car, cdr)
-        return avail
+        if not self.avail.isnull():
+            avail = self.avail
+            self.avail = self.cells[avail.val].cdr
+            self.cells[avail.val].update(car, cdr)
+            return avail
+        else:
+            raise Exception("List memory full (size=" +
+                            str(self.size) + "). Cannot recover.")
 
     def mark(self, elt):
         if elt.isnull():
             return
 
         if elt.isptr:
+            self.cells[elt.val].mark = True
             self.mark(self.cells[elt.val].car)
-            self.cells[elt.val].cdr.mark = True
             self.mark(self.cells[elt.val].cdr)
+
+    def sweep(self):
+        i = 0
+        for cell in self.cells:
+            if not cell.mark:
+                cell.car = ListElt(0, False)
+                cell.cdr = self.avail
+                self.avail = ListElt(i, True)
+            else:
+                cell.mark = False
+            i += 1
 
     def pushctx(self, ctx):
         """Push a new context into the global context list"""

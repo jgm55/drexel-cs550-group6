@@ -6,24 +6,9 @@
 
 from structures import Expr
 from list_memory import ListElt
+from uuid import uuid1
 
 tabstop = '  '  # 2 spaces
-
-
-class Concat(Expr):
-    '''expression for concating two lists'''
-
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-
-    def eval(self, nt, ft, mem):
-        return self.lhs.eval(nt, ft, mem) + self.rhs.eval(nt, ft, mem)
-
-    def display(self, nt, ft, mem, depth=0):
-        print "%sCONCAT" % (tabstop * depth)
-        self.lhs.display(nt, ft, mem, depth + 1)
-        self.rhs.display(nt, ft, mem, depth + 1)
 
 
 class Element(Expr):
@@ -49,11 +34,19 @@ class List(Element):
 
     def eval(self, nt, ft, mem):
         L = ListElt()
+        tempkeys = []
         for i in reversed(self.contents):
             e = i.eval(nt, ft, mem)
             if not isinstance(e, ListElt):
                 e = ListElt(e, False)
             L = mem.cons(e, L)
+            # Save temporary list to name table to support GC
+            tk = '___listtemp' + str(uuid1())
+            tempkeys.append(tk)
+            nt[tk] = L
+        # Clean up temporary names
+        for k in tempkeys:
+            del nt[k]
         return L
 
     def display(self, nt, ft, mem, depth=0):
@@ -238,7 +231,3 @@ class Listp(Expr):
             print "%s%i" % (tabstop * depth, 1)
         else:
             print "%s%i" % (tabstop * depth, 0)
-
-
-if __name__ == '__main__':
-    test_memory()

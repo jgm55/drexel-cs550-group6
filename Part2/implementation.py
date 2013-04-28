@@ -262,12 +262,12 @@ def p_def_ident(p):
 
 def p_concat(p):
     'expr : expr CONCAT list'
-    p[0] = Concat(p[1], p[3])
+    p[0] = Cons(p[1], p[3])
 
 
 def p_concat_id(p):
     'expr : expr CONCAT d_ident'
-    p[0] = Concat(p[1], p[3])
+    p[0] = Cons(p[1], p[3])
 
 
 def p_list(p):
