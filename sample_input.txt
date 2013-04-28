@@ -13,6 +13,6 @@ a := [1,[[23]], [4,6], 6,7,8,9,0,2,2];
 b := car(a);
 c := cdr(a);
 d := cons(b, c);
-e := b || c;
+e := [b] || c;
 sizeten := listlength(a);
 sizezero := listlength([])

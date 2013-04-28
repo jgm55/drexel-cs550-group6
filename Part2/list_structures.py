@@ -17,6 +17,42 @@ from uuid import uuid1
 tabstop = '  '  # 2 spaces
 
 
+class Concat(Expr):
+    '''expression for concating two lists'''
+
+    def __init__(self, lhs, rhs):
+        self.lhs = lhs
+        self.rhs = rhs
+
+    def eval(self, nt, ft, mem):
+        lhs = self.lhs.eval(nt, ft, mem)
+        rhs = self.rhs.eval(nt, ft, mem)
+        if not isinstance(lhs, ListElt) or not isinstance(rhs, ListElt):
+            raise Exception("Concatenation requires two list arguments")
+
+        # Create temporary keys
+        tkL = '___listtemp' + str(uuid1())
+        tkR = '___listtemp' + str(uuid1())
+
+        # Save expression and List in temporary in case cons has to GC
+        nt[tkL] = lhs
+        nt[tkR] = rhs
+
+        # Cons the expression and list
+        C = mem.concat(lhs, rhs)
+
+        # Clear temporary keys
+        del nt[tkL]
+        del nt[tkR]
+
+        return C
+
+    def display(self, nt, ft, mem, depth=0):
+        print "%sCONCAT" % (tabstop * depth)
+        self.lhs.display(nt, ft, mem, depth + 1)
+        self.rhs.display(nt, ft, mem, depth + 1)
+
+
 class Element(Expr):
     '''Lists and numbers inheret from this'''
 
@@ -106,8 +142,8 @@ class Car(Expr):
             raise Exception("Argument must be a list")
             return
         try:
-            print "L0 is ", mem.cells[L.val].car
-            return mem.cells[L.val].car
+            print "L0 is ", mem.cells[L.val].car.val
+            return mem.cells[L.val].car.val
         except:
             raise Exception("No elements left in the list to return")
         #raise exception

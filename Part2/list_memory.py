@@ -66,6 +66,11 @@ class ListMemory:
         # Set cdr of last cell to end of list
         self.cells[-1].cdr = ListElt(-1, True)
 
+    def concat(self, lhs, rhs):
+        if not lhs.isptr or not rhs.isptr:
+            raise Exception("Concat can only operate on list pointers")
+        return self.cons(self.cells[lhs.val].car, rhs)
+
     def cons(self, car, cdr):
         """Allocate a free block and return the element.
            Performs garbage collection no available blocks.
