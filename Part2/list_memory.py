@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #
+# CS550 Group 6
 # Ryan Daugherty
 # Tom Houman
 # Joe Muoio
