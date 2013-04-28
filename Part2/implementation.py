@@ -1,12 +1,12 @@
 #!/usr/bin/python
 #
-#	A python implementation of the mini language, with user-defined
-#	functions
-#
 # Ryan Daugherty
 # Tom Houman
 # Joe Muoio
+# CS550 Spring 2013
+# Assignment 2
 #
+# A python implementation of the mini language, with user-defined functions
 # Modified from code provided by Kurt Schmidt
 
 import sys
@@ -132,7 +132,7 @@ def p_program(p):
     'program : stmt_list'
     P = Program(p[1])
     #P.display()
-    print 'Running Program'
+    print 'Running Program with memory size ' + str(P.memsize)
     P.eval()
     P.dump()
 

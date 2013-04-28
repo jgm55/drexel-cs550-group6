@@ -1,16 +1,18 @@
-#
-# Assignment 2 makefile
-#
-# Spring 2012
-# Drexel CS550 Group 6
 # Ryan Daugherty
 # Tom Houman
 # Joe Muoio
+# CS550 Spring 2013
+# Assignment 2
+#
+# makefile
+# Top-level makefile for assignment 2
+
+MEMSIZE=20
 
 view-part1 : ./Part1/implementation.py ./Part1/list_implementation.py ./Part1/structures.py ./Part1/list_structures.py
 	more ./Part1/*.py
 
-view-part2 : ./Part2/implementation.py ./Part2/structures.py ./Part2/list_structures.py
+view-part2 : ./Part2/implementation.py ./Part2/structures.py ./Part2/list_structures.py ./Part2/list_memory.py
 	more ./Part2/*.py
 
 build : 
@@ -20,7 +22,7 @@ run-part1 : ./Part1/implementation.py ./Part1/list_implementation.py ./Part1/str
 	python ./Part1/implementation.py
 
 run-part2 : ./Part2/implementation.py ./Part2/structures.py ./Part2/list_structures.py
-	python ./Part2/implementation.py
+	python ./Part2/implementation.py $(MEMSIZE)
 
 view-func1 : listLengthIterative
 	more ./listLengthIterative

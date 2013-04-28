@@ -3,6 +3,11 @@
 # Ryan Daugherty
 # Tom Houman
 # Joe Muoio
+# CS550 Spring 2013
+# Assignment 2
+#
+# list_structures.py
+# Classes supporting parsing and interpreting of lists in mini language
 
 from structures import Expr
 from list_memory import ListElt

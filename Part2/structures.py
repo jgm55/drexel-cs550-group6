@@ -1,11 +1,13 @@
 #!/usr/bin/python
 #
-# Classes to represent underlying data structures for the grammar
-#
 # Ryan Daugherty
 # Tom Houman
 # Joe Muoio
+# CS550 Spring 2013
+# Assignment 2
 #
+# structures.py
+# Classes to represent underlying data structures for the grammar
 # Modified from code provided by Kurt Schmidt
 
 import sys

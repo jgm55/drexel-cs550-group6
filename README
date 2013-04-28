@@ -1,27 +1,51 @@
-Joe Muoio
 Ryan Daugherty
 Tom Houman
+Joe Muoio
+CS550 Spring 2013
+Assignment 2
+README
 
-
+--------
+Overview
+--------
 To run our parser use the following makefile commands:
 
 	make view-part1 : views all the python files associated with part 1
-	make view-part2 : views all the python files associated with part 2 
+	make view-part2 : views all the python files associated with part 2
 	make build : sort of useless, since we are using python
 	
 	run-part1 : runs the parser for part 1
-	run-part2 : runs the parser for part 1
+	run-part2 : runs the parser for part 2
 	
-	view-func1 : views the function for iterative list length written for our parser
-	view-func2 : views the function for recursive list length written for our parser
+	view-func1 : views the mini language function for iterative list length
+	view-func2 : views the mini language function for recursive list length
 
-	clean : cleans all the useless generated files
+	clean : cleans all the generated files
 
-The return value for a function looks like : "return:=[stuff to return]"	
+The return value for a function looks like : "return:=[stuff to return]"
+
+------------
+Part 1 Notes
+------------
+We tested part1 by using our listLength files along with testing cons, cdr,
+|| and car extensively on our own using both lists and variables in the
+function calls. The most complex sample input is included (sample_input.txt).
+We also did basic testing with the operators from the given code to verify
+that the types worked properly (cannot do list+list, but can do
+number+number, etc)
 	
-We tested part1 by using our listLength files along with testing cons, cdr, || and car extensively on our own 
-	using both lists and variables in the function calls. We also did basic testing with the operators from the 
-	given code to verify that the types worked properly (cannot do list+list, but can do number+number, etc)
-	
-	
-Most of the development for Part1 was done on Windows, but was verified on Tux.cs.drexel.edu (when it wasn't down).
+Most of the development for Part1 was done on Windows, but was verified on
+Tux.cs.drexel.edu (when it wasn't down).
+
+------------
+Part 2 Notes
+------------
+Part 2 was tested similarly to part 1, with the difference being that garbage
+collection required a more complex sample input to invoke. The included
+sample_input.txt will run successfully with a minimum memory size of 16.
+Using a size of 16 or 17 will trigger garbage collection when creating list a.
+When running part 2, the default memory size is 20. To change the default,
+pass a size as the first argument to the interpreter. Change the MEMSIZE
+variable in the makefile to change the memory size.
+
+Part 2 was developed on MacOS 10.7 and was verified on Tux.cs.drexel.edu.

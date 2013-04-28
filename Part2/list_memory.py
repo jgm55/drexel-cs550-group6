@@ -3,6 +3,11 @@
 # Ryan Daugherty
 # Tom Houman
 # Joe Muoio
+# CS550 Spring 2013
+# Assignment 2
+#
+# list_memory.py
+# Classes supporting use of dynamic memory with garbage collection
 
 
 class ListElt:
