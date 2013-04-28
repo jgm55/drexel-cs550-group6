@@ -71,13 +71,8 @@ class ListMemory:
                 for name, val in ctx.items():
                     if isinstance(val, ListElt):
                         self.mark(val)
-            print "GC Context:"
-            print self.ctx
-            print "GC After Mark:"
-            print str(self)
+            # Sweep and reclaim unmarked cells
             self.sweep()
-            print "GC After Sweep:"
-            print str(self)
 
         if not self.avail.isnull():
             avail = self.avail
@@ -85,8 +80,8 @@ class ListMemory:
             self.cells[avail.val].update(car, cdr)
             return avail
         else:
-            raise Exception("List memory full (size=" +
-                            str(self.size) + "). Cannot recover.")
+            raise Exception("List memory full " +
+                            "(size=" + str(self.size) + "). ")
 
     def mark(self, elt):
         if elt.isnull():

@@ -36,13 +36,22 @@ class List(Element):
         L = ListElt()
         tempkeys = []
         for i in reversed(self.contents):
+            # Create temporary key for this loop iteration
+            tk = '___listtemp' + str(uuid1())
+            tempkeys.append(tk)
+
+            # Evaluate the expression
             e = i.eval(nt, ft, mem)
             if not isinstance(e, ListElt):
                 e = ListElt(e, False)
+
+            # Save expression in temporary in case cons has to GC
+            nt[tk] = e
+
+            # Cons the expression and list
             L = mem.cons(e, L)
-            # Save temporary list to name table to support GC
-            tk = '___listtemp' + str(uuid1())
-            tempkeys.append(tk)
+
+            # Update temporary link to completed list for next iteration
             nt[tk] = L
         # Clean up temporary names
         for k in tempkeys:
@@ -142,17 +151,29 @@ class Cons(Expr):
 
         e = self.label_e.eval(nt, ft, mem)
         L = self.label_l.eval(nt, ft, mem)
-        #print "e",e,type(e)
-        #print "L",L,type(L)
-        #print "L[0]",L[0],type(L[0])
         if not isinstance(L, ListElt):
             raise Exception("Second argument must be a ListElt")
             return
         E = e
         if not isinstance(e, ListElt):
             E = ListElt(e, False)
-        #C = [e] + L
-        return mem.cons(E, L)
+
+        # Create temporary keys
+        tkE = '___listtemp' + str(uuid1())
+        tkL = '___listtemp' + str(uuid1())
+
+        # Save expression and List in temporary in case cons has to GC
+        nt[tkE] = E
+        nt[tkL] = L
+
+        # Cons the expression and list
+        C = mem.cons(E, L)
+
+        # Clear temporary keys
+        del nt[tkE]
+        del nt[tkL]
+
+        return C
 
     def display(self, nt, ft, mem, depth=0):
         e = self.label_e.eval(nt, ft, mem)
