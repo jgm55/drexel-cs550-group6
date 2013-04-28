@@ -1,0 +1,27 @@
+Joe Muoio
+Ryan Daugherty
+Tom Houman
+
+
+To run our parser use the following makefile commands:
+
+	make view-part1 : views all the python files associated with part 1
+	make view-part2 : views all the python files associated with part 2 
+	make build : sort of useless, since we are using python
+	
+	run-part1 : runs the parser for part 1
+	run-part2 : runs the parser for part 1
+	
+	view-func1 : views the function for iterative list length written for our parser
+	view-func2 : views the function for recursive list length written for our parser
+
+	clean : cleans all the useless generated files
+
+The return value for a function looks like : "return:=[stuff to return]"	
+	
+We tested part1 by using our listLength files along with testing cons, cdr, || and car extensively on our own 
+	using both lists and variables in the function calls. We also did basic testing with the operators from the 
+	given code to verify that the types worked properly (cannot do list+list, but can do number+number, etc)
+	
+	
+Most of the development for Part1 was done on Windows, but was verified on Tux.cs.drexel.edu (when it wasn't down).
