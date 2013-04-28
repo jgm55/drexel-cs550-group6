@@ -395,11 +395,16 @@ def test_parser(arg=sys.argv):
     #x := 5;
     #sum( x )'''
     #initialize_builtins()
-    print "Please enter the program,  terminate with CTRL+D on a new line"
-
     data = ""
-    data
-    data += sys.stdin.read()
+    if len(arg) >= 2:
+        Program.memsize = int(sys.argv[1])
+
+    if len(arg) >= 3:
+        data = open(sys.argv[2], 'r').read()
+    else:
+        print "Please enter the program,  terminate with CTRL+D on a new line"
+        data = sys.stdin.read()
+
     yacc.parse(data)
 
 if __name__ == '__main__':

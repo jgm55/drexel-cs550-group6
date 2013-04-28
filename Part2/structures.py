@@ -9,6 +9,8 @@
 # Modified from code provided by Kurt Schmidt
 
 import sys
+from list_memory import ListMemory
+from list_memory import ListElt
 
 ####  CONSTANTS   ################
 
@@ -27,7 +29,7 @@ class Expr:
         raise NotImplementedError(
             'Expr: pure virtual base class.  Do not instantiate')
 
-    def eval(self, nt, ft):
+    def eval(self, nt, ft, mem):
         '''Given an environment and a function table, evaluates the expression,
         returns the value of the expression (an int in this grammar)'''
 
@@ -40,7 +42,7 @@ class Expr:
     def isInt(self):
         return False
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         'For debugging.'
         raise NotImplementedError(
             'Expr.display: virtual method.  Must be overridden.')
@@ -52,10 +54,10 @@ class Ident(Expr):
     def __init__(self, name):
         self.name = name
 
-    def eval(self, nt, ft):
+    def eval(self, nt, ft, mem):
         return nt[self.name]
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%s%s" % (tabstop * depth, self.name)
 
 
@@ -72,15 +74,15 @@ class Times(Expr):
         self.lhs = lhs
         self.rhs = rhs
 
-    def eval(self, nt, ft):
-        return self.lhs.eval(nt, ft) * self.rhs.eval(nt, ft)
+    def eval(self, nt, ft, mem):
+        return self.lhs.eval(nt, ft, mem) * self.rhs.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sMULT" % (tabstop * depth)
-        self.lhs.display(nt, ft, depth + 1)
-        self.rhs.display(nt, ft, depth + 1)
+        self.lhs.display(nt, ft, mem, depth + 1)
+        self.rhs.display(nt, ft, mem, depth + 1)
 
-    #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
+    #print "%s= %i" % (tabstop*depth, self.eval( nt, ft, mem ))
 
 
 class Plus(Expr):
@@ -92,15 +94,15 @@ class Plus(Expr):
         self.lhs = lhs
         self.rhs = rhs
 
-    def eval(self, nt, ft):
-        return self.lhs.eval(nt, ft) + self.rhs.eval(nt, ft)
+    def eval(self, nt, ft, mem):
+        return self.lhs.eval(nt, ft, mem) + self.rhs.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sADD" % (tabstop * depth)
-        self.lhs.display(nt, ft, depth + 1)
-        self.rhs.display(nt, ft, depth + 1)
+        self.lhs.display(nt, ft, mem, depth + 1)
+        self.rhs.display(nt, ft, mem, depth + 1)
 
-    #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
+    #print "%s= %i" % (tabstop*depth, self.eval( nt, ft, mem ))
 
 
 class Minus(Expr):
@@ -112,15 +114,15 @@ class Minus(Expr):
         self.lhs = lhs
         self.rhs = rhs
 
-    def eval(self, nt, ft):
-        return self.lhs.eval(nt, ft) - self.rhs.eval(nt, ft)
+    def eval(self, nt, ft, mem):
+        return self.lhs.eval(nt, ft, mem) - self.rhs.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sSUB" % (tabstop * depth)
-        self.lhs.display(nt, ft, depth + 1)
-        self.rhs.display(nt, ft, depth + 1)
+        self.lhs.display(nt, ft, mem, depth + 1)
+        self.rhs.display(nt, ft, mem, depth + 1)
 
-    #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
+    #print "%s= %i" % (tabstop*depth, self.eval( nt, ft, mem ))
 
 
 class FunCall(Expr):
@@ -131,13 +133,13 @@ class FunCall(Expr):
         self.name = name
         self.argList = argList
 
-    def eval(self, nt, ft):
-        return ft[self.name].apply(nt, ft, self.argList)
+    def eval(self, nt, ft, mem):
+        return ft[self.name].apply(nt, ft, mem, self.argList)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sFunction Call: %s, args:" % (tabstop * depth, self.name)
         for e in self.argList:
-            e.display(nt, ft, depth + 1)
+            e.display(nt, ft, mem, depth + 1)
 
 
 #-------------------------------------------------------
@@ -149,14 +151,14 @@ class Stmt:
         raise NotImplementedError(
             'Stmt: pure virtual base class.  Do not instantiate')
 
-    def eval(self, nt, ft):
+    def eval(self, nt, ft, mem):
         '''Given an environment and a function table, evaluates the expression,
         returns the value of the expression (an int in this grammar)'''
 
         raise NotImplementedError(
             'Stmt.eval: virtual method.  Must be overridden.')
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         'For debugging.'
         raise NotImplementedError(
             'Stmt.display: virtual method.  Must be overridden.')
@@ -171,12 +173,12 @@ class AssignStmt(Stmt):
         self.name = name
         self.rhs = rhs
 
-    def eval(self, nt, ft):
-        nt[self.name] = self.rhs.eval(nt, ft)
+    def eval(self, nt, ft, mem):
+        nt[self.name] = self.rhs.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sAssign: %s :=" % (tabstop * depth, self.name)
-        self.rhs.display(nt, ft, depth + 1)
+        self.rhs.display(nt, ft, mem, depth + 1)
 
 
 class DefineStmt(Stmt):
@@ -186,12 +188,12 @@ class DefineStmt(Stmt):
         self.name = name
         self.proc = proc
 
-    def eval(self, nt, ft):
+    def eval(self, nt, ft, mem):
         ft[self.name] = self.proc
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sDEFINE %s :" % (tabstop * depth, self.name)
-        self.proc.display(nt, ft, depth + 1)
+        self.proc.display(nt, ft, mem, depth + 1)
 
 
 class IfStmt(Stmt):
@@ -205,19 +207,19 @@ class IfStmt(Stmt):
         self.tBody = tBody
         self.fBody = fBody
 
-    def eval(self, nt, ft):
-        if self.cond.eval(nt, ft) > 0:
-            self.tBody.eval(nt, ft)
+    def eval(self, nt, ft, mem):
+        if self.cond.eval(nt, ft, mem) > 0:
+            self.tBody.eval(nt, ft, mem)
         else:
-            self.fBody.eval(nt, ft)
+            self.fBody.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sIF" % (tabstop * depth)
-        self.cond.display(nt, ft, depth + 1)
+        self.cond.display(nt, ft, mem, depth + 1)
         print "%sTHEN" % (tabstop * depth)
-        self.tBody.display(nt, ft, depth + 1)
+        self.tBody.display(nt, ft, mem, depth + 1)
         print "%sELSE" % (tabstop * depth)
-        self.fBody.display(nt, ft, depth + 1)
+        self.fBody.display(nt, ft, mem, depth + 1)
 
 
 class WhileStmt(Stmt):
@@ -225,15 +227,15 @@ class WhileStmt(Stmt):
         self.cond = cond
         self.body = body
 
-    def eval(self, nt, ft):
-        while self.cond.eval(nt, ft) > 0:
-            self.body.eval(nt, ft)
+    def eval(self, nt, ft, mem):
+        while self.cond.eval(nt, ft, mem) > 0:
+            self.body.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sWHILE" % (tabstop * depth)
-        self.cond.display(nt, ft, depth + 1)
+        self.cond.display(nt, ft, mem, depth + 1)
         print "%sDO" % (tabstop * depth)
-        self.body.display(nt, ft, depth + 1)
+        self.body.display(nt, ft, mem, depth + 1)
 
 #-------------------------------------------------------
 
@@ -247,14 +249,14 @@ class StmtList:
     def insert(self, stmt):
         self.sl.insert(0, stmt)
 
-    def eval(self, nt, ft):
+    def eval(self, nt, ft, mem):
         for s in self.sl:
-            s.eval(nt, ft)
+            s.eval(nt, ft, mem)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sSTMT LIST" % (tabstop * depth)
         for s in self.sl:
-            s.display(nt, ft, depth + 1)
+            s.display(nt, ft, mem, depth + 1)
 
 
 class Proc:
@@ -274,7 +276,7 @@ class Proc:
         self.parList = paramList
         self.body = body
 
-    def apply(self, nt, ft, args):
+    def apply(self, nt, ft, mem, args):
         newContext = {}
 
         # sanity check, # of args
@@ -286,39 +288,50 @@ class Proc:
         # use zip, bastard
         for i in range(len(args)):
             print "self.parList[i]:", self.parList[i]
-            print "args[i].eval( nt, ft )", args[i].eval(nt, ft)
-            newContext[self.parList[i]] = args[i].eval(nt, ft)
+            newContext[self.parList[i]] = args[i].eval(nt, ft, mem)
+            if isinstance(newContext[self.parList[i]], ListElt):
+                print "args[i].eval( nt, ft, mem )", mem.walk(newContext[self.parList[i]])
+            else:
+                print "args[i].eval( nt, ft, mem )", newContext[self.parList[i]]
 
         # evaluate the function body using the new name table and the old (only)
         # function table.  Note that the proc's return value is stored as
         # 'return in its nametable
 
-        self.body.eval(newContext, ft)
+        mem.pushctx(newContext)
+        self.body.eval(newContext, ft, mem)
+        mem.popctx()
         if newContext.has_key(returnSymbol):
             return newContext[returnSymbol]
         else:
             print "Error:  no return value"
             sys.exit(2)
 
-    def display(self, nt, ft, depth=0):
+    def display(self, nt, ft, mem, depth=0):
         print "%sPROC %s :" % (tabstop * depth, str(self.parList))
-        self.body.display(nt, ft, depth + 1)
+        self.body.display(nt, ft, mem, depth + 1)
 
 
 class Program:
+    memsize = 20
     def __init__(self, stmtList):
         self.stmtList = stmtList
         self.nameTable = {}
         self.funcTable = {}
+        self.listMemory = ListMemory(self.memsize)
+        self.listMemory.pushctx(self.nameTable)
 
     def eval(self):
-        self.stmtList.eval(self.nameTable, self.funcTable)
+        self.stmtList.eval(self.nameTable, self.funcTable, self.listMemory)
 
     def dump(self):
         print "Dump of Symbol Table"
         print "Name Table"
         for k in self.nameTable:
-            print "  %s -> %s " % ( str(k), str(self.nameTable[k]) )
+            if isinstance(self.nameTable[k], ListElt):
+                print "  %s -> %s " % (str(k), self.listMemory.walk(self.nameTable[k]))
+            else:
+                print "  %s -> %s " % (str(k), str(self.nameTable[k]))
         print "Function Table"
         for k in self.funcTable:
             print "  %s" % str(k)
@@ -326,5 +339,5 @@ class Program:
 
     def display(self, depth=0):
         #print "%sPROGRAM :" % (tabstop*depth)
-        self.stmtList.display(self.nameTable, self.funcTable)
+        self.stmtList.display(self.nameTable, self.funcTable, self.ListMemory)
 
