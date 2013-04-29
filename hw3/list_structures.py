@@ -7,6 +7,7 @@
 import structures
 from structures import Expr
 from structures import Ident
+from structures import addToSymbolTable
 
 
 tabstop = '  ' # 2 spaces
@@ -77,8 +78,9 @@ class Number( Element ) :
 	def isInt():
 		return True
 	def translate( self, nt, ft ):
+		address = addToSymbolTable( str(self.value), self.value )
 		
-		return self.value
+		return address
 		
 class Car( Expr ) :
 	'''first entry'''

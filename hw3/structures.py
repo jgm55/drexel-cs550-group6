@@ -20,8 +20,73 @@ tabstop = '  ' # 2 spaces
 
 #####  Globals    #################
 
-variableCounter = 0
+symbolCounter = 1
+temporaryCounter = 1
 
+symbolTable = {} # maps a symbolic key to a tuple containing (memory address, value)
+
+code = '' # the compiled code
+
+
+#########	Helper functions	############
+
+def dumpSymbolTable():
+	global symbolTable
+	global symbolCounter
+	table = ""
+	allocations = [0]*symbolCounter
+	for k, v in symbolTable.iteritems():
+		allocations[int(v[0])] = k
+	for i in range(1, symbolCounter):
+		k = allocations[i]
+		v = symbolTable[k]
+		table += str(v[0]) + "  " + str(v[1]) + " ; "
+		try:
+			int(k)
+			table += "constant " + k
+		except ValueError:
+			table += "variable " + k
+		table += "\n"
+	return table
+
+def getAddressFromSymbolTable(key):
+	try:
+		address = symbolTable[key][0] 
+	except:
+		address = addToSymbolTable( key, 0 ) 
+	
+	return address
+		
+
+def addToSymbolTable(key, value):
+	# adds the value at the location of key
+	# key is the symbol in the program that was parsed
+	# value is the numerical value of the thing being stored
+	# returns the symbol table address.
+	global symbolTable
+	global symbolCounter
+	
+	if key not in symbolTable :
+		symbolTable[key] = (str(symbolCounter), value)
+		symbolCounter += 1
+		
+	return symbolTable[key][0]
+	
+def addTempToSymbolTable(value=0):
+	# adds the value at the location of "temporary_#"
+	# value is the numerical value of the key
+	# returns the symbol table address.
+	global symbolTable
+	global symbolCounter
+	global temporaryCounter
+	
+	key = "temporary_"+str(temporaryCounter)
+	symbolTable[key] = (str(symbolCounter), value)
+	symbolCounter += 1
+	temporaryCounter += 1
+				
+	return symbolTable[key][0]	
+	
 ######   CLASSES   ##################
 
 class Expr :
@@ -63,14 +128,10 @@ class Ident( Expr ) :
 	def display( self, nt, ft, depth=0 ) :
 		print "%s%s" % (tabstop*depth, self.name)
 	def translate( self, nt, ft ):
-		global variableCounter
 		
-		ntLookup = nt[ self.name].translate( nt, ft )
-		code = "LDA " + str(ntLookup)
-		code += "\nSTA t" + str(variableCounter) + "\n"
-		variableCounter += 1
-		
-		return code;
+		address = addToSymbolTable( str(self.name), 0 ) 
+		#we use 0 since it will get its real value when it is assigned.
+		return address
 
 class Times( Expr ) :
 	'''expression for binary multiplication'''
@@ -94,22 +155,22 @@ class Times( Expr ) :
 		self.rhs.display( nt, ft, depth+1 )
 		#print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
 	def translate(self,nt,ft):
-		global variableCounter
+		global symbolCounter
 		
 		code = self.lhs.translate(nt,ft)
 		code += self.rhs.translate(nt,ft)
 		c = 0
 		code += "LD 0\n"
 		if self.lhs > self.rhs:
-			addr = "t"+str(variableCounter - 2)
+			addr = "t"+str(symbolCounter - 2)
 			lesserSide = self.rhs
 		else:
-			addr = "t"+str(variableCounter - 1) 
+			addr = "t"+str(symbolCounter - 1) 
 			lesserSide = self.lhs
 		while c < lesserSide:
 			code += "ADD t" + addr + "\n"
-		code += "STA t" + str(variableCounter) + "\n"
-		variableCounter += 1
+		code += "STA t" + str(symbolCounter) + "\n"
+		symbolCounter += 1
 		return code
 
 class Plus( Expr ) :
@@ -130,16 +191,19 @@ class Plus( Expr ) :
 		self.rhs.display( nt, ft, depth+1 )
 		#print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
 	def translate(self,nt,ft):
-		#must call translate??
-		global variableCounter
+		global code
+	
+		addrl = self.lhs.translate(nt,ft)
+		addrr = self.rhs.translate(nt,ft)
+		addrresult = addTempToSymbolTable()
 		
-		code = self.rhs.translate(nt,ft)
-		code += self.lhs.translate(nt,ft)
-		code += "LD t"+str(variableCounter - 2)
-		code += "\nADD t" + str(variableCounter - 1) + "\n"
-		code += "STA t" + str(variableCounter) + "\n"
-		variableCounter += 1
-		return code
+		code += "LDA " + addrl + "\n"
+		code += "ADD " + addrr + "\n"
+		
+		code += "STA " + addrresult + "\n"
+		
+		return addrresult
+		
 
 class Minus( Expr ) :
 	'''expression for binary subtraction'''
@@ -160,14 +224,14 @@ class Minus( Expr ) :
 		#print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
 	def translate(self,nt,ft):
 		#must call translate??
-		global variableCounter
+		global symbolCounter
 		
 		code = self.rhs.translate(nt,ft)
 		code += self.lhs.translate(nt,ft)
-		code += "LD t"+str(variableCounter - 2) 
-		code += "\nSUB t" + str(int(variableCounter - 1)) + "\n"
-		code += "STA t" + str(variableCounter) + "\n"
-		variableCounter += 1
+		code += "LD t"+str(symbolCounter - 2) 
+		code += "\nSUB t" + str(int(symbolCounter - 1)) + "\n"
+		code += "STA t" + str(symbolCounter) + "\n"
+		symbolCounter += 1
 		return code
 
 class FunCall( Expr ) :
@@ -207,7 +271,9 @@ class Stmt :
 		'For debugging.'
 		raise NotImplementedError(
 			'Stmt.display: virtual method.  Must be overridden.' )
-
+	def translate ( self, nt, ft, depth=0):
+		raise NotImplementedError(
+			'Stmt.translate: virtual method.  Must be overridden.' )
 
 class AssignStmt( Stmt ) :
 	'''adds/modifies symbol in the current context'''
@@ -226,7 +292,11 @@ class AssignStmt( Stmt ) :
 		self.rhs.display( nt, ft, depth+1 )
 	def translate( self, nt, ft ) :
 		#print "%sAssign: %s :=" % (tabstop*depth, self.name)
-		return self.rhs.translate( nt, ft )
+		global code
+		addrresult = self.rhs.translate( nt, ft )
+		code += 'LDA ' + addrresult + "\n"
+		code += 'STA ' + getAddressFromSymbolTable( self.name ) + "\n"
+		getAddressFromSymbolTable( self.name )
 
 class IfStmt( Stmt ) :
 
@@ -291,10 +361,8 @@ class StmtList :
 		for s in self.sl :
 			s.display( nt, ft, depth+1 )
 	def translate( self, nt, ft ):
-		code = ""
 		for s in self.sl :
-			code += s.translate( nt, ft )
-		return code
+			s.translate( nt, ft )
 
 class Program :
 	
@@ -320,4 +388,5 @@ class Program :
 		#print "%sPROGRAM :" % (tabstop*depth)
 		self.stmtList.display( self.nameTable, self.funcTable )
 	def translate(self):
-		return self.stmtList.translate( self.nameTable, self.funcTable )
+		self.stmtList.translate( self.nameTable, self.funcTable )
+		return code

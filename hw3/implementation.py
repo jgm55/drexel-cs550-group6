@@ -128,7 +128,10 @@ def p_program( p ) :
 	print 'Running Program'
 	P.eval()
 	P.dump()
+	print "\nNow printing the RAL code\n"
 	print P.translate()
+	print "\nNow printing the Symbol table\n"
+	print dumpSymbolTable()
 
 def p_stmt_list( p ) :
 	'''stmt_list : stmt SEMICOLON stmt_list
