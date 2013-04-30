@@ -1,0 +1,29 @@
+Joe Muoio
+Tom Hauman
+RyanDaugherty
+
+Assignment 3 
+
+Our compiler is awesome.
+
+We tested it using a variety of expression assignements, conditionals and while-loops. 
+We also tested using sample code provided from lecture notes. 
+
+For the optimization if there are any consecutive loads/stores to the same address, we remove
+the second line. NOTE: if the second line is a labelled line we do not remove this as that line 
+needs to be executed when it is jumped to.
+	
+
+to run:
+
+	make view: views the python code
+	make compile : runs the python code 
+	
+	make view-trans : views the symbolic code
+	make view-link : views the linked code
+	make view-op : views the optimized linked code
+	
+	make run : runs the non optimized code on the RAM simulator
+	make run-op : runs the optimized code on the RAM simulator
+	
+	make clean : cleans the out files and the pyc files

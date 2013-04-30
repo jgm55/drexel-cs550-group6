@@ -78,9 +78,11 @@ class Number( Element ) :
 	def isInt():
 		return True
 	def translate( self, nt, ft ):
-		address = addToSymbolTable( str(self.value), self.value )
+		key = 'Const_'+str(self.value)
 		
-		return address
+		address = addToSymbolTable( key, self.value, 'constant' )
+		
+		return key
 		
 class Car( Expr ) :
 	'''first entry'''

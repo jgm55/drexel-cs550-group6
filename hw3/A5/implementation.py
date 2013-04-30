@@ -120,7 +120,7 @@ import ply.yacc as yacc
 
 	# create a function for each production (note the prefix)
 	# The rule is given in the doc string
-
+	
 def p_program( p ) :
 	'program : stmt_list'
 	P = Program( p[1] )
@@ -129,10 +129,11 @@ def p_program( p ) :
 	P.eval()
 	P.dump()
 	print "\nNow printing the RAL code\n"
-	print P.translate()
-	print "\nNow printing the Symbol table\n"
-	print dumpSymbolTable()
-
+	if len(sys.argv) > 1:
+		P.compile(True)
+	else:
+		P.compile()
+	
 def p_stmt_list( p ) :
 	'''stmt_list : stmt SEMICOLON stmt_list
        | stmt'''
