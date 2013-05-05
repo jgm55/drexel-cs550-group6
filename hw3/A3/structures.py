@@ -74,7 +74,9 @@ def addToSymbolTable(key, value, t):
 	if key not in symbolTable :
 		symbolTable[key] = (str(symbolCounter), value, t )
 		symbolCounter += 1
-		
+	if t == 'label':
+		temp = symbolTable[key][0]
+		symbolTable[key] = ( temp, value, t )
 	return key
 	
 def addTempToSymbolTable(value=0):
@@ -497,7 +499,7 @@ class Program :
 		for l in lines:
 			tok = l.split(' ')
 			if tok[0][0] == 'J':
-				#replace L_ with line number on second pass
+				#replace L_ with line number
 				tok[1] = str(getValueFromSymbolTable(tok[1]))
 				
 			tokenizedCode += ' '.join(tok)

@@ -12,6 +12,8 @@ We also tested using sample code provided from lecture notes.
 For the optimization if there are any consecutive loads/stores to the same address, we remove
 the second line. NOTE: if the second line is a labelled line we do not remove this as that line 
 needs to be executed when it is jumped to.
+
+We do this optimization every combination of consecutive load/store (eg: load/load, load/store, etc)
 	
 
 to run:

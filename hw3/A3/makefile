@@ -13,10 +13,10 @@ view-op : linkedOptimized.out
 run : ./linkedNonOpt.out ./symbolTable.out
 	~jjohnson/bin/ram linkedNonOpt.out symbolTable.out
 run-op: ./linkedOptimized.out ./symbolTable.out
-	~jjohnson/bin/ram linkedNonOpt.out symbolTable.out
+	~jjohnson/bin/ram linkedOptimized.out symbolTable.out
 	
 clean : 
 	rm ./*.out
-	rm./*.pyc
+	rm ./*.pyc
 	
 	
