@@ -1,0 +1,7 @@
+i := 5;
+n := 0;
+while (i) do
+n := n + i;
+i := i - 1
+od
+

@@ -1,0 +1,34 @@
+# CS550 Group 6
+# Tom Houman (A4 Leader)
+# Ryan Daugherty
+# Joe Muoio
+# CS550 Spring 2013
+# Assignment 4
+
+Our compiler is awesome.
+
+We tested it using a variety of expression assignments, conditionals and while-loops.
+We also tested using sample code provided from lecture notes. 
+
+For the optimization if there are any consecutive loads/stores to the same address, we remove
+the second line. NOTE: if the second line is a labelled line we do not remove this as that line 
+needs to be executed when it is jumped to.
+
+We do this optimization every combination of consecutive load/store (eg: load/load, load/store, etc)
+	
+
+to run:
+
+	make view: views the python code
+	make compile : runs the python code 
+	
+	make view-trans : views the symbolic code
+	make view-link : views the linked code
+	make view-op : views the optimized linked code
+	
+	make run : runs the non optimized code on the RAM simulator
+	make run-op : runs the optimized code on the RAM simulator
+	
+	make clean : cleans the out files and the pyc files
+
+	<optional> set RAM_MEM before invoking run target to specify memory size
