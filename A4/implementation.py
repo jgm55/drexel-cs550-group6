@@ -40,6 +40,9 @@ tokens = (
     'THEN',
     'ELSE',
     'FI',
+    'DEFINE',
+    'PROC',
+    'END',
     'IDENT',
     'CONS',
     'CDR',
@@ -58,6 +61,9 @@ reserved = {
     'then': 'THEN',
     'else': 'ELSE',
     'fi': 'FI',
+    'define': 'DEFINE',
+    'proc': 'PROC',
+    'end': 'END',
     'car': 'CAR',
     'cdr': 'CDR',
     'nullp': 'NULLP',
@@ -99,6 +105,7 @@ def t_NUMBER(t):
     # t.value holds the string that matched.  Dynamic typing - no unions
     t.value = int(t.value)
     return t
+
 
 # These are standard little ditties:
 def t_newline(t):
@@ -155,7 +162,8 @@ def p_stmt_list(p):
 def p_stmt(p):
     '''stmt : assign_stmt
                 | while_stmt
-                | if_stmt'''
+                | if_stmt
+                | define_stmt'''
     p[0] = p[1]
 
 
@@ -229,16 +237,32 @@ def p_if(p):
     p[0] = IfStmt(p[2], p[4], p[6])
 
 
+def p_def(p):
+    'define_stmt : DEFINE IDENT PROC LPAREN param_list RPAREN stmt_list END'
+    p[0] = DefineStmt(p[2], Proc(p[5], p[7]))
+
+
+def p_param_list(p):
+    '''param_list : IDENT COMMA param_list
+                | IDENT'''
+    if len(p) == 2:  # single param => new list
+        p[0] = [p[1]]
+    else:  # we have a param_list, keep adding to front
+        p[3].insert(0, p[1])
+        p[0] = p[3]
+
+
 def p_func_call(p):
     'func_call : IDENT LPAREN expr_list RPAREN'
     p[0] = FunCall(p[1], p[3])
+
 
 # Error rule for syntax errors
 def p_error(p):
     print "Syntax error in input!", str(p)
     sys.exit(2)
 
-########################### was in list implementation #############################3
+
 def p_def_ident(p):
     'd_ident : IDENT'
     p[0] = Ident(p[1])
@@ -258,25 +282,21 @@ def p_list(p):
     'list : LSQUARE sequence RSQUARE'
     p[0] = List(p[2])
 
-#print "to [seq]",p[0]
 
 def p_empty_list(p):
     'list : LSQUARE RSQUARE'
     p[0] = List([])
 
-#print "to empty", p[0]
 
 def p_sequence(p):
     'sequence : list_element COMMA sequence'
     p[0] = [p[1]] + p[3]
 
-#print "to list , seq", p[0]
 
 def p_sequence_list_element(p):
     'sequence : list_element'
     p[0] = [p[1]]
 
-#print "tolistElem", p[0]
 
 def p_list_element_element(p):
     'list_element : expr'

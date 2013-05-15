@@ -11,6 +11,8 @@
 #
 # Modified from code provided by Kurt Schmidt
 
+import sys
+
 ####  CONSTANTS   ################
 
 # the variable name used to store a proc's return value
@@ -267,6 +269,9 @@ class FunCall(Expr):
         for e in self.argList:
             e.display(nt, ft, depth + 1)
 
+    def translate(self, nt, ft):
+        raise NotImplementedError('FunCall.translate: TODO')
+
 
 #-------------------------------------------------------
 
@@ -316,6 +321,24 @@ class AssignStmt(Stmt):
         keyResult = self.rhs.translate(nt, ft)
         code += 'LDA ' + keyResult + "\n"
         code += 'STA ' + str(self.name) + "\n"
+
+
+class DefineStmt(Stmt):
+    '''Binds a proc object to a name'''
+
+    def __init__(self, name, proc):
+        self.name = name
+        self.proc = proc
+
+    def eval(self, nt, ft):
+        ft[self.name] = self.proc
+
+    def display(self, nt, ft, depth=0):
+        print "%sDEFINE %s :" % (tabstop * depth, self.name)
+        self.proc.display(nt, ft, depth + 1)
+
+    def translate(self, nt, ft):
+        raise NotImplementedError('DefineStmt.translate: TODO')
 
 
 class IfStmt(Stmt):
@@ -427,6 +450,57 @@ class StmtList:
     def translate(self, nt, ft):
         for s in self.sl:
             s.translate(nt, ft)
+
+
+class Proc:
+    '''stores a procedure (formal params, and the body)
+
+    Note that, while each function gets its own environment, we decided not to
+    allow side-effects, so, no access to any outer contexts.  Thus, nesting
+    functions is legal, but no different than defining them all in the global
+    environment.  Further, all calls are handled the same way, regardless of
+    the calling environment (after the actual args are evaluated); the proc
+    doesn't need/want/get an outside environment.'''
+
+    def __init__(self, paramList, body):
+        '''expects a list of formal parameters (variables, as strings), and a
+        StmtList'''
+
+        self.parList = paramList
+        self.body = body
+
+    def apply(self, nt, ft, args):
+        newContext = {}
+
+        # sanity check, # of args
+        if len(args) is not len(self.parList):
+            print "Param count does not match:"
+            sys.exit(1)
+
+        # bind parameters in new name table (the only things there right now)
+        # use zip, bastard
+        for i in range(len(args)):
+            print "self.parList[i]:", self.parList[i]
+            print "args[i].eval( nt, ft )", args[i].eval(nt, ft)
+            newContext[self.parList[i]] = args[i].eval(nt, ft)
+
+        # evaluate the function body using the new name table and the old (only)
+        # function table.  Note that the proc's return value is stored as
+        # 'return in its nametable
+
+        self.body.eval(newContext, ft)
+        if newContext.has_key(returnSymbol):
+            return newContext[returnSymbol]
+        else:
+            print "Error:  no return value"
+            sys.exit(2)
+
+    def display(self, nt, ft, depth=0):
+        print "%sPROC %s :" % (tabstop * depth, str(self.parList))
+        self.body.display(nt, ft, depth + 1)
+
+    def translate(self, nt, ft):
+        raise NotImplementedError('Proc.translate: TODO')
 
 
 class Program:
