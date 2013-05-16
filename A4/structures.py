@@ -22,82 +22,84 @@ tabstop = '  ' # 2 spaces
 
 #####  Globals    #################
 
-symbolCounter = 1
-temporaryCounter = 1
-linkerCounter = 1
-
-symbolTable = {} # maps a symbolic key to a tuple containing (memory address, value, label)
-
 code = '' # the compiled code
 
 
-#########	Helper functions	############
+######### Helper classes ############
 
-def dumpSymbolTable():
-    global symbolTable
-    global symbolCounter
-    table = ""
-    allocations = [0] * symbolCounter
-    for k, v in symbolTable.iteritems():
-        allocations[int(v[0])] = k
-    for i in range(1, symbolCounter):
-        k = allocations[i]
-        v = symbolTable[k]
-        table += str(v[0]) + "  " + str(v[1]) + " ; "
-        table += str(v[2]) + ' ' + k
-        table += "\n"
-    return table
+class SymbolTable:
 
+    # class-wide link count (static)
+    linkcount = 0
 
-def getAddressFromSymbolTable(key):
-    try:
-        address = symbolTable[key][0]
-    except:
-        address = symbolTable[addToSymbolTable(key, 0, 'variable')][0]
+    def __init__(self):
+        # maps a symbolic key to a tuple containing (memory address, value, label)
+        self.table = {}
 
-    return address
+        # current local variable count (including temporary)
+        self.localcount = 1
 
+        # current local temporary count
+        self.tempcount = 1
+        pass
 
-def getValueFromSymbolTable(key):
-    try:
-        val = symbolTable[key][1]
-    except:
-        val = symbolTable[addToSymbolTable(key, 0, 'variable')][1]
+    @classmethod
+    def makeLink(cls):
+        cls.linkcount += 1
+        return 'L' + str(cls.linkcount)
 
-    return val
+    def dump(self):
+        table = ""
+        allocations = [0] * self.localcount
+        for k, v in self.table.iteritems():
+            allocations[int(v[0])] = k
+        for i in range(1, self.localcount):
+            k = allocations[i]
+            v = self.table[k]
+            table += str(v[0]) + "  " + str(v[1]) + " ; "
+            table += str(v[2]) + ' ' + k
+            table += "\n"
+        return table
 
+    def getAddress(self, key):
+        try:
+            address = self.table[key][0]
+        except:
+            address = self.table[self.add(key, 0, 'variable')][0]
+        return address
 
-def addToSymbolTable(key, value, t):
-    # adds the value at the location of key
-    # key is the symbol in the program that was parsed
-    # value is the numerical value of the thing being stored
-    # returns the symbol table address.
-    global symbolTable
-    global symbolCounter
+    def getValue(self, key):
+        try:
+            val = self.table[key][1]
+        except:
+            val = self.table[self.add(key, 0, 'variable')][1]
+        return val
 
-    if key not in symbolTable:
-        symbolTable[key] = (str(symbolCounter), value, t )
-        symbolCounter += 1
-    if t == 'label':
-        temp = symbolTable[key][0]
-        symbolTable[key] = ( temp, value, t )
-    return key
+    def add(self, key, value, t):
+        # adds the value at the location of key
+        # key is the symbol in the program that was parsed
+        # value is the numerical value of the thing being stored
+        # returns the symbol table address.
 
+        if key not in self.table:
+            self.table[key] = (str(self.localcount), value, t)
+            self.localcount += 1
+        if t == 'label':
+            temp = self.table[key][0]
+            self.table[key] = (temp, value, t)
+        return key
 
-def addTempToSymbolTable(value=0):
-    # adds the value at the location of "temporary_#"
-    # value is the numerical value of the key
-    # returns the symbol table address.
-    global symbolTable
-    global symbolCounter
-    global temporaryCounter
+    def addTemp(self, value=0):
+        # adds the value at the location of "temporary_#"
+        # value is the numerical value of the key
+        # returns the symbol table address.
 
-    key = "Temp_" + str(temporaryCounter)
-    symbolTable[key] = ( str(symbolCounter), value, 'temporary' )
-    symbolCounter += 1
-    temporaryCounter += 1
+        key = "Temp_" + str(self.tempcount)
+        self.table[key] = (str(self.localcount), value, 'temporary')
+        self.localcount += 1
+        self.tempcount += 1
+        return key
 
-    return key
 
 ######   CLASSES   ##################
 
@@ -126,7 +128,7 @@ class Expr:
         raise NotImplementedError(
             'Expr.display: virtual method.  Must be overridden.')
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         'For debugging.'
         raise NotImplementedError(
             'Expr.translate: virtual method.  Must be overridden.')
@@ -144,9 +146,9 @@ class Ident(Expr):
     def display(self, nt, ft, depth=0):
         print "%s%s" % (tabstop * depth, self.name)
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         key = str(self.name)
-        addToSymbolTable(key, 0, 'variable')
+        st.add(key, 0, 'variable')
         #we use 0 since it will get its real value when it is assigned.
 
         return key
@@ -172,12 +174,12 @@ class Times(Expr):
         self.rhs.display(nt, ft, depth + 1)
 
     #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         global code
 
-        keyl = self.lhs.translate(nt, ft)
-        keyr = self.rhs.translate(nt, ft)
-        keyt = addTempToSymbolTable()
+        keyl = self.lhs.translate(st, ft)
+        keyr = self.rhs.translate(st, ft)
+        keyt = st.addTemp()
 
         code += "LDA " + keyl + "\n"
         code += "MUL " + keyr + "\n"
@@ -205,12 +207,12 @@ class Plus(Expr):
         self.rhs.display(nt, ft, depth + 1)
 
     #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         global code
 
-        keyl = self.lhs.translate(nt, ft)
-        keyr = self.rhs.translate(nt, ft)
-        keyt = addTempToSymbolTable()
+        keyl = self.lhs.translate(st, ft)
+        keyr = self.rhs.translate(st, ft)
+        keyt = st.addTemp()
 
         code += "LDA " + keyl + "\n"
         code += "ADD " + keyr + "\n"
@@ -238,12 +240,12 @@ class Minus(Expr):
         self.rhs.display(nt, ft, depth + 1)
 
     #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         global code
 
-        keyl = self.lhs.translate(nt, ft)
-        keyr = self.rhs.translate(nt, ft)
-        keyt = addTempToSymbolTable()
+        keyl = self.lhs.translate(st, ft)
+        keyr = self.rhs.translate(st, ft)
+        keyt = st.addTemp()
 
         code += "LDA " + keyl + "\n"
         code += "SUB " + keyr + "\n"
@@ -269,7 +271,7 @@ class FunCall(Expr):
         for e in self.argList:
             e.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         raise NotImplementedError('FunCall.translate: TODO')
 
 
@@ -294,7 +296,7 @@ class Stmt:
         raise NotImplementedError(
             'Stmt.display: virtual method.  Must be overridden.')
 
-    def translate(self, nt, ft, depth=0):
+    def translate(self, st, ft, depth=0):
         raise NotImplementedError(
             'Stmt.translate: virtual method.  Must be overridden.')
 
@@ -315,10 +317,10 @@ class AssignStmt(Stmt):
         print "%sAssign: %s :=" % (tabstop * depth, self.name)
         self.rhs.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         #print "%sAssign: %s :=" % (tabstop*depth, self.name)
         global code
-        keyResult = self.rhs.translate(nt, ft)
+        keyResult = self.rhs.translate(st, ft)
         code += 'LDA ' + keyResult + "\n"
         code += 'STA ' + str(self.name) + "\n"
 
@@ -337,7 +339,7 @@ class DefineStmt(Stmt):
         print "%sDEFINE %s :" % (tabstop * depth, self.name)
         self.proc.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         raise NotImplementedError('DefineStmt.translate: TODO')
 
 
@@ -366,28 +368,28 @@ class IfStmt(Stmt):
         print "%sELSE" % (tabstop * depth)
         self.fBody.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
-        keyC = self.cond.translate(nt, ft)
-        global linkerCounter
+    def translate(self, st, ft):
+        keyC = self.cond.translate(st, ft)
         global code
 
+        elseLink = SymbolTable.makeLink()
+        continueLink = SymbolTable.makeLink()
+
         code += "LDA " + keyC + "\n"
-        code += "JMN " + 'L' + str(linkerCounter) + '\n'
-        code += "JMZ " + 'L' + str(linkerCounter) + '\n'
-        linkerCounter += 1
+        code += "JMN " + elseLink + '\n'
+        code += "JMZ " + elseLink + '\n'
 
         #call code for true
-        self.tBody.translate(nt, ft)
-        code += "JMP " + 'L' + str(linkerCounter) + '\n'
+        self.tBody.translate(st, ft)
+        code += "JMP " + continueLink + '\n'
 
-        code += 'L' + str(linkerCounter - 1) + ': '
-        linkerCounter += 1
+        code += elseLink + ': '
 
         #call code for false
-        self.fBody.translate(nt, ft)
+        self.fBody.translate(st, ft)
 
         #go to rest of code
-        code += 'L' + str(linkerCounter - 1) + ': '
+        code += continueLink + ': '
 
 
 class WhileStmt(Stmt):
@@ -405,27 +407,26 @@ class WhileStmt(Stmt):
         print "%sDO" % (tabstop * depth)
         self.body.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
-        global linkerCounter
+    def translate(self, st, ft):
         global code
 
-        code += 'L' + str(linkerCounter) + ': '
-        linkerCounter += 1
+        loopLink = SymbolTable.makeLink()
+        continueLink = SymbolTable.makeLink()
+
+        code += loopLink + ': '
 
         #calls condition
-        keyC = self.cond.translate(nt, ft)
+        keyC = self.cond.translate(st, ft)
 
         code += "LDA " + keyC + "\n"
-        code += "JMN " + 'L' + str(linkerCounter) + '\n'
-        code += "JMZ " + 'L' + str(linkerCounter) + '\n'
-        linkerCounter += 1
+        code += "JMN " + continueLink + '\n'
+        code += "JMZ " + continueLink + '\n'
 
         #call code for body
-        self.body.translate(nt, ft)
+        self.body.translate(st, ft)
 
-        code += "JMP " + 'L' + str(linkerCounter - 2) + '\n'
-
-        code += 'L' + str(linkerCounter - 1) + ': '
+        code += "JMP " + loopLink + '\n'
+        code += continueLink + ': '
 
 #-------------------------------------------------------
 
@@ -447,9 +448,9 @@ class StmtList:
         for s in self.sl:
             s.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         for s in self.sl:
-            s.translate(nt, ft)
+            s.translate(st, ft)
 
 
 class Proc:
@@ -499,7 +500,7 @@ class Proc:
         print "%sPROC %s :" % (tabstop * depth, str(self.parList))
         self.body.display(nt, ft, depth + 1)
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         raise NotImplementedError('Proc.translate: TODO')
 
 
@@ -508,6 +509,7 @@ class Program:
         self.stmtList = stmtList
         self.nameTable = {}
         self.funcTable = {}
+        self.symbolTable = SymbolTable()
 
     def eval(self):
         self.stmtList.eval(self.nameTable, self.funcTable)
@@ -527,7 +529,7 @@ class Program:
         self.stmtList.display(self.nameTable, self.funcTable)
 
     def translate(self):
-        self.stmtList.translate(self.nameTable, self.funcTable)
+        self.stmtList.translate(self.symbolTable, self.funcTable)
         global code
         code += 'HLT'
         return code
@@ -573,7 +575,7 @@ class Program:
             tok = l.split(' ')
             lineNumber += 1
             if tok[0][-1] == ':':
-                addToSymbolTable(tok[0][0:-1], lineNumber, 'label')
+                self.symbolTable.add(tok[0][0:-1], lineNumber, 'label')
                 tok = tok[1:]
             if tok[0] == "HLT":
                 pass
@@ -582,7 +584,7 @@ class Program:
                 pass
 
             else:
-                tok[1] = getAddressFromSymbolTable(tok[1])
+                tok[1] = self.symbolTable.getAddress(tok[1])
 
             tokenizedCode += ' '.join(tok)
             tokenizedCode += '\n'
@@ -595,7 +597,7 @@ class Program:
             tok = l.split(' ')
             if tok[0][0] == 'J':
                 #replace L_ with line number
-                tok[1] = str(getValueFromSymbolTable(tok[1]))
+                tok[1] = str(self.symbolTable.getValue(tok[1]))
 
             tokenizedCode += ' '.join(tok)
             tokenizedCode += '\n'
@@ -621,7 +623,7 @@ class Program:
         print 'linkedCode: \n', linkedCode, '\n\n'
         self.printToFile('linkedNonOpt.out', linkedCode)
 
-        symTable = dumpSymbolTable()
+        symTable = self.symbolTable.dump()
         print 'symbolTable: \n', symTable
         self.printToFile('symbolTable.out', symTable)
 

@@ -8,7 +8,6 @@
 # Assignment 4
 
 from structures import Expr
-from structures import addToSymbolTable
 
 
 tabstop = '  ' # 2 spaces
@@ -85,10 +84,10 @@ class Number(Element):
     def isInt():
         return True
 
-    def translate(self, nt, ft):
+    def translate(self, st, ft):
         key = 'Const_' + str(self.value)
 
-        address = addToSymbolTable(key, self.value, 'constant')
+        address = st.add(key, self.value, 'constant')
 
         return key
 
