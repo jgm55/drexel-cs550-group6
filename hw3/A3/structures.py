@@ -330,23 +330,26 @@ class IfStmt( Stmt ) :
 		global linkerCounter
 		global code
 		
-		code += "LDA " + keyC + "\n"
-		code += "JMN " + 'L' + str(linkerCounter) + '\n'
-		code += "JMZ " + 'L' + str(linkerCounter)  + '\n'
-		linkerCounter += 1
+		linkerCounter += 3	
 		
+		code += "LDA " + keyC + "\n"
+		code += "JMN " + 'L' + str(linkerCounter-1) + '\n'
+		code += "JMZ " + 'L' + str(linkerCounter-1)  + '\n'
+		
+		tempLinkCounter = linkerCounter
 		#call code for true
 		self.tBody.translate(nt, ft)
-		code += "JMP " + 'L'+ str(linkerCounter) + '\n'
+		code += "JMP " + 'L'+ str(tempLinkCounter) + '\n'
 		
-		code += 'L' + str(linkerCounter - 1) + ': '
-		linkerCounter += 1
+		code += 'L' + str(tempLinkCounter - 1) + ': '
+		
+		linkerCounter += 1 
 		
 		#call code for false
 		self.fBody.translate(nt,ft)
 		
 		#go to rest of code
-		code += 'L' + str(linkerCounter - 1) + ': '
+		code += 'L' + str(tempLinkCounter) + ': '
 
 class WhileStmt( Stmt ) :
 
@@ -370,20 +373,22 @@ class WhileStmt( Stmt ) :
 		code += 'L' + str(linkerCounter) + ': '
 		linkerCounter += 1
 		
+		tempLinkCounter = linkerCounter
+		
 		#calls condition
 		keyC = self.cond.translate(nt,ft)
 		
 		code += "LDA " + keyC + "\n"
-		code += "JMN " + 'L' + str(linkerCounter) + '\n'
-		code += "JMZ " + 'L' + str(linkerCounter)  + '\n'
+		code += "JMN " + 'L' + str(tempLinkCounter) + '\n'
+		code += "JMZ " + 'L' + str(tempLinkCounter)  + '\n'
 		linkerCounter += 1
 		
 		#call code for body
 		self.body.translate(nt, ft)
 		
-		code += "JMP " + 'L'+ str(linkerCounter - 2) + '\n'
+		code += "JMP " + 'L'+ str(tempLinkCounter - 1) + '\n'
 		
-		code += 'L' + str(linkerCounter - 1) + ': '
+		code += 'L' + str(tempLinkCounter ) + ': '
 		
 #-------------------------------------------------------
 
@@ -506,12 +511,31 @@ class Program :
 			tokenizedCode += '\n'
 			
 		return tokenizedCode[0:-1]
+		
+	def symbolCodeLabelCondenser(self, symbCode):
+		splitLines = symbCode.split('\n')
+		
+		for j in range(len(splitLines)):
+			while(splitLines[j].count(':')>1):
+				label = splitLines[j][0:splitLines[j].find(':')]
+				splitLines[j] = splitLines[j][splitLines[j].find(':')+2:]
+				newLabel = splitLines[j][0:splitLines[j].find(':')]
+				for l in range(len(splitLines)):
+					splitLines[l].replace(label+':',newLabel+':')
+					if( ('JMP ' in splitLines[l] or 'JMN ' in splitLines[l] or 'JMZ ' in splitLines[l]) and splitLines[l][-1*len(label):] == label):
+						splitLines[l] = splitLines[l][0:-1*len(label)] + newLabel
+					
+		
+		return '\n'.join(splitLines)
 	def compile(self, opt=False):
 		'''calls translate, optionally calls optimize, and then calls link'''
 		global code
 		code = ''
 		
 		symbCode = self.translate()
+		print 'Symbolic1: \n',symbCode, '\n\n'
+		symbCode = self.symbolCodeLabelCondenser(symbCode)
+		
 		print 'Symbolic: \n',symbCode, '\n\n\n\n'
 		self.printToFile('symbolic.out',symbCode)
 		
