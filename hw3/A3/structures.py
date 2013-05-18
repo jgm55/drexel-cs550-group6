@@ -451,7 +451,6 @@ class Program :
 		
 		tokenizedCode = ''
 		lines = code.split('\n')
-		print lines,'\n\n'
 		while len(lines) > 1:
 			
 			focus = lines.pop(0)
@@ -533,10 +532,9 @@ class Program :
 		code = ''
 		
 		symbCode = self.translate()
-		print 'Symbolic1: \n',symbCode, '\n\n'
 		symbCode = self.symbolCodeLabelCondenser(symbCode)
 		
-		print 'Symbolic: \n',symbCode, '\n\n\n\n'
+		print 'Symbolic: \n',symbCode, '\n\n\n'
 		self.printToFile('symbolic.out',symbCode)
 		
 		if opt:
