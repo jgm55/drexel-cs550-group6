@@ -84,11 +84,8 @@ class Number(Element):
     def isInt():
         return True
 
-    def translate(self, st, ft):
-        key = 'Const_' + str(self.value)
-
-        address = st.add(key, self.value, 'constant')
-
+    def translate(self, f, ft):
+        key = ft.addConst(self.value)
         return key
 
 
