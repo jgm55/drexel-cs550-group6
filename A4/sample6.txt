@@ -1,0 +1,14 @@
+define helper
+proc(i)
+return := i
+end;
+
+define addr
+proc(i)
+if i then return := helper(i) + addr(helper(i)-1)
+else return := 0
+fi
+end;
+
+sumfive := addr(5)
+

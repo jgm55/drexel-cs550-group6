@@ -1,0 +1,25 @@
+define sum
+proc(i)
+n := 0;
+zero := 0;
+while (i) do
+while zero do
+junk := 1
+od;
+if i then
+if i then
+if i then
+n := n + i;
+i := i - 1
+else junk := 1
+fi
+else junk := 1
+fi
+else junk := 1
+fi
+od;
+return := n
+end;
+
+sumfive := sum(5)
+

@@ -5,18 +5,31 @@
 # CS550 Spring 2013
 # Assignment 4
 
-Our compiler is awesome.
+The compiler is working with procedures, including recursion.
 
-We tested it using a variety of expression assignments, conditionals and while-loops.
-We also tested using sample code provided from lecture notes. 
+File summary:
+ - implementation.py: Main code entry point, parses code into data structures
+ - structures.py: All of the compiling is done here using the parsed structures
+ - list_structures.py: Legacy list implementation (compiler does not support lists)
+ - sample<N>.txt: Samples used to test the compiler, all working correctly
+
+After running 'make compile':
+ - symbolic.out: Symbolic RAL code
+ - linkedNonOpt.out: Non-optimized linked RAL code
+ - linkedOptimized.out: Optimized linked RAL code
+ - symbolTable.out: Symbol table for input to RAM simulator
+ - activationRecords.out: Summary of the activation records in symbol table format
+
+We tested it using a variety of functions, expressions, and if/while statements.
+The samples used to test the code are included and are named sampleN.txt. All tests
+were run on both MacOS 10.7.5 and tux.
 
 For the optimization if there are any consecutive loads/stores to the same address, we remove
 the second line. NOTE: if the second line is a labelled line we do not remove this as that line 
-needs to be executed when it is jumped to.
-
-We do this optimization every combination of consecutive load/store (eg: load/load, load/store, etc)
+needs to be executed when it is jumped to. We do this optimization every combination of
+consecutive load/store (eg: load/load, load/store, etc). Furthermore, all constants are stored
+globally only once, so this can be considered an optimization.
 	
-
 to run:
 
 	make view: views the python code
@@ -31,4 +44,5 @@ to run:
 	
 	make clean : cleans the out files and the pyc files
 
-	<optional> set RAM_MEM before invoking run target to specify memory size
+	<optional> set RAM_MEM before invoking run target to specify memory size:
+	   RAM_MEM=100 make run
