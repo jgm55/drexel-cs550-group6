@@ -36,17 +36,24 @@ RETURN = 'return'
 class SymbolTable:
     def __init__(self):
         self.table = {}
-        self.size = 0
 
     def add(self, key, value, comment):
         if key not in self.table:
-            self.size += 1
-            self.table[key] = (self.size, value, comment)
+            self.table[key] = (len(self.table) + 1, value, comment)
         else:
             raise Exception('Duplicate symbol ' + str(key))
 
+    def setValue(self, key, value):
+        self.table[key] = (self.table[key][0], value, self.table[key][2])
+
     def getAddr(self, key):
         return self.table[key][0]
+
+    def getOffset(self, key):
+        return self.table[key][0] - 1
+
+    def size(self):
+        return len(self.table)
 
     def dump(self):
         table = ""
@@ -57,6 +64,7 @@ class SymbolTable:
             table += str(addr) + "  " + str(v[0]) + " ; " + str(v[1])
             table += "\n"
         return table
+
 
 class CompilerFunction:
 
@@ -133,7 +141,7 @@ class CompilerFunction:
         return offset
 
     def stackSize(self):
-        return len(self.param) + len(self.var) + len(self.temp) + len(self.support)
+        return self.table.size()
 
     def __str__(self):
         return self.code
@@ -149,8 +157,15 @@ class CompilerProgram:
         self.bootcode = ''
         self.code = ''
 
-    def dump(self):
+    def dumpSymbolTable(self):
         return self.table.dump()
+
+    def dumpActivationRecords(self):
+        out = ''
+        for key, func in sorted(self.functions.iteritems()):
+            out += key + ':\n'
+            out += func.table.dump()
+        return out
 
     def addConst(self, value):
         # fun-fact: this implementation is auto-optimizing on constants
@@ -246,12 +261,21 @@ class CompilerProgram:
         aBUF1 = str(self.table.getAddr(BUF1))
         aBUF2 = str(self.table.getAddr(BUF2))
 
+        # initialize FP and SP with correct values in memory
+        initFP = self.table.size() + 1
+        initSP = initFP + self.functions[self.mainKey].table.getOffset(RA)
+        self.table.setValue(FP, initFP)
+        self.table.setValue(SP, initSP)
+
+        # bootstrap code to call main and then halt the program
+        code = 'CAL ' + self.mainKey + '\n'
+        code += 'HLT' + '\n'
+
         # first pass:
         # - lay out global code listing
         # - link constants globally
         # - transform non-const LD/ST to reference call stack
         # - transform CAL instructions
-        code = self.bootcode
         for key, func in sorted(self.functions.iteritems()):
             lines = str(func).split('\n')
             for l in lines:
@@ -261,31 +285,40 @@ class CompilerProgram:
                     while tok[0][-1] == ':':
                         code += tok[0] + ' '
                         tok = tok[1:]
-                    if tok[0] in ['LDA', 'STA', 'JMI']:
-                        if tok[1] in self.table.table:
-                            # Link global constants and special registers
-                            tok[1] = str(self.table.getAddr(tok[1]))
-                            code += ' '.join(tok) + '\n'
-                        else:
-                            # convert LDA/STA to load from offset from FP
-                            instr = tok[0][:-1] + 'I'
-                            code += 'LDA ' + aFP + '\n'
-                            code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getAddr(tok[1])))) + '\n'
-                            code += 'STA ' + aBUF1 + '\n'
-                            code += instr + ' ' + aBUF1 + '\n'
+                    if tok[0] != 'CAL' and tok[1] in self.table.table:
+                        # Link global constants and special registers
+                        tok[1] = str(self.table.getAddr(tok[1]))
+                        code += ' '.join(tok) + '\n'
+                    elif tok[0] == 'LDA':
+                        # convert LDA to load from offset from FP
+                        code += 'LDA ' + aFP + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(tok[1])))) + '\n'
+                        code += 'STA ' + aBUF1 + '\n'
+                        code += 'LDI ' + aBUF1 + '\n'
+                    elif tok[0] == 'STA':
+                        # convert STA to load from offset from FP
+                        code += 'STA ' + aBUF2 + '\n'  # store AC in temp buffer
+                        code += 'LDA ' + aFP + '\n'  # load current frame pointer
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(tok[1])))) + '\n'
+                        code += 'STA ' + aBUF1 + '\n'  # store destination address
+                        code += 'LDA ' + aBUF2 + '\n'  # reload AC from temp
+                        code += 'STI ' + aBUF1 + '\n'  # store value indirectly in destination
+                    elif tok[0] == 'JMI':
+                        # convert JMI to load from offset from FP
+                        code += 'LDA ' + aFP + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(tok[1])))) + '\n'
+                        code += 'STA ' + aBUF1 + '\n'
+                        code += 'LDI ' + aBUF1 + '\n'
+                        code += 'STA ' + aBUF1 + '\n'
+                        code += 'JMI ' + aBUF1 + '\n'
                     elif tok[0] in ['ADD', 'SUB', 'MUL']:
-                        if tok[1] in self.const:
-                            # Link global constant
-                            tok[1] = str(self.table.getAddr(tok[1]))
-                            code += ' '.join(tok) + '\n'
-                        else:
-                            # convert ADD/SUB/MUL to use offset from FP
-                            code += 'STA ' + aBUF2 + '\n'
-                            code += 'LDA ' + aFP + '\n'
-                            code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getAddr(tok[1])))) + '\n'
-                            code += 'STA ' + aBUF1 + '\n'
-                            code += 'LDI ' + aBUF1 + '\n'
-                            code += tok[0] + ' ' + aBUF2 + '\n'
+                        # convert ADD/SUB/MUL to use offset from FP
+                        code += 'STA ' + aBUF2 + '\n'  # store AC in temp buffer
+                        code += 'LDA ' + aFP + '\n'  # load current frame pointer
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(tok[1])))) + '\n'
+                        code += 'STA ' + aBUF1 + '\n'  # store target address
+                        code += 'LDI ' + aBUF1 + '\n'  # load target
+                        code += tok[0] + ' ' + aBUF2 + '\n'  # compute with temp
                     elif tok[0] == 'CAL':
                         # symbolic CAL is 'CAL func return arg1 ... argN'
                         fname = tok[1]
@@ -295,23 +328,25 @@ class CompilerProgram:
                         for arg in tok[3:]:
                             args.append(arg)
 
+                        print 'call ' + fname + ', stacksize=' + str(callfunc.stackSize())
                         # Initiate call
                         # 1. Create activation record
                             # 1. Update FP and SP
 
-                        # update FP (FP = FP + func.stackSize())
+                        # update FP (FP = SP + 1)
                         code += 'LDA ' + aFP + '\n'
                         code += 'STA ' + aBUF2 + '\n'  # save the old FP temporarily
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.stackSize()))) + '\n'
+                        code += 'LDA ' + aSP + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(1))) + '\n'
                         code += 'STA ' + aFP + '\n'
 
                         # update SP (SP = FP + addr(RA))
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getAddr(RA)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getOffset(RA)))) + '\n'
                         code += 'STA ' + aSP + '\n'
 
                         # store previous FP in activation record
                         code += 'LDA ' + aFP + '\n'
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getAddr(PFP)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getOffset(PFP)))) + '\n'
                         code += 'STA ' + aBUF1 + '\n'
                         code += 'LDA ' + aBUF2 + '\n'  # the old FP we saved above
                         code += 'STI ' + aBUF1 + '\n'
@@ -320,24 +355,26 @@ class CompilerProgram:
                         argcount = 0
                         for arg in args:
                             if arg in self.table.table:
-                                code += 'LDA ' + str(self.table.getAddr(arg))  + '\n'
-                                code += 'STA ' + aBUF1 + '\n'  # addr of global argument
+                                code += 'LDA ' + str(self.table.getAddr(arg)) + '\n'
+                                code += 'STA ' + aBUF1 + '\n'  # value of global argument
                             else:
                                 code += 'LDA ' + aFP + '\n'
-                                code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getAddr(PFP)))) + '\n'
+                                code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getOffset(PFP)))) + '\n'
                                 code += 'STA ' + aBUF1 + '\n'
                                 code += 'LDI ' + aBUF1 + '\n'  # prev fp
-                                code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getAddr(arg)))) + '\n'
+                                code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(arg)))) + '\n'
                                 code += 'STA ' + aBUF1 + '\n'  # addr of local argument
+                                code += 'LDI ' + aBUF1 + '\n'  # load value of argument
+                                code += 'STA ' + aBUF1 + '\n'  # value of local argument
 
-                            # local arg now in BUF1
+                            # arg value now in BUF1
 
                             # to get parameter address, assume ordering of parameters
                             # parameters start at FP
                             code += 'LDA ' + aFP + '\n'
                             code += 'ADD ' + str(self.table.getAddr(self.constKey(argcount))) + '\n'
                             code += 'STA ' + aBUF2 + '\n'  # destination
-                            code += 'LDI ' + aBUF1 + '\n'  # load local arg value
+                            code += 'LDA ' + aBUF1 + '\n'  # load value of argument
                             code += 'STI ' + aBUF2 + '\n'  # store to destination
                             argcount += 1
 
@@ -347,26 +384,26 @@ class CompilerProgram:
                         # (call has returned)
                         # retrieve return value from activation record
                         code += 'LDA ' + aFP + '\n'
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getAddr(RETURN)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getOffset(RETURN)))) + '\n'
                         code += 'STA ' + aBUF1 + '\n'  # addr of return value
                         code += 'LDA ' + aFP + '\n'
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getAddr(PFP)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getOffset(PFP)))) + '\n'
                         code += 'STA ' + aBUF2 + '\n'  # previous FP addr
                         code += 'LDI ' + aBUF2 + '\n'  # previous FP
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getAddr(retsym)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(retsym)))) + '\n'
                         code += 'STA ' + aBUF2 + '\n'  # return symbol addr
                         code += 'LDI ' + aBUF1 + '\n'  # load return value
                         code += 'STI ' + aBUF2 + '\n'  # store in return symbol
 
                         # Reset FP (FP = prefFP)
                         code += 'LDA ' + aFP + '\n'
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getAddr(PFP)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(callfunc.table.getOffset(PFP)))) + '\n'
                         code += 'STA ' + aBUF1 + '\n'
                         code += 'LDI ' + aBUF1 + '\n'  # prev fp
                         code += 'STA ' + aFP + '\n'
 
                         # Reset SP (SP = FP + addr(RA))
-                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getAddr(RA)))) + '\n'
+                        code += 'ADD ' + str(self.table.getAddr(self.constKey(func.table.getOffset(RA)))) + '\n'
                         code += 'STA ' + aSP + '\n'
 
                     else:
@@ -483,8 +520,10 @@ class Times(Expr):
     #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
     def translate(self, f, ft):
         temp = f.addTemp()
-        f.addCode("LDA " + self.lhs.translate(f, ft))
-        f.addCode("MUL " + self.rhs.translate(f, ft))
+        lhs = self.lhs.translate(f, ft)
+        rhs = self.rhs.translate(f, ft)
+        f.addCode("LDA " + lhs)
+        f.addCode("MUL " + rhs)
         f.addCode("STA " + temp)
         return temp
 
@@ -509,8 +548,10 @@ class Plus(Expr):
     #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
     def translate(self, f, ft):
         temp = f.addTemp()
-        f.addCode("LDA " + self.lhs.translate(f, ft))
-        f.addCode("ADD " + self.rhs.translate(f, ft))
+        lhs = self.lhs.translate(f, ft)
+        rhs = self.rhs.translate(f, ft)
+        f.addCode("LDA " + lhs)
+        f.addCode("ADD " + rhs)
         f.addCode("STA " + temp)
         return temp
 
@@ -535,8 +576,10 @@ class Minus(Expr):
     #print "%s= %i" % (tabstop*depth, self.eval( nt, ft ))
     def translate(self, f, ft):
         temp = f.addTemp()
-        f.addCode("LDA " + self.lhs.translate(f, ft))
-        f.addCode("SUB " + self.rhs.translate(f, ft))
+        lhs = self.lhs.translate(f, ft)
+        rhs = self.rhs.translate(f, ft)
+        f.addCode("LDA " + lhs)
+        f.addCode("SUB " + rhs)
         f.addCode("STA " + temp)
         return temp
 
@@ -813,10 +856,8 @@ class Program:
     def translate(self):
         self.prog = CompilerProgram()
         main = self.prog.addMainFunction()
-        self.prog.addBootCode('JMP ' + main.name)
-        main.addCodeLabel(main.name)
-        self.stmtList.translate(main, self.prog)
-        main.addCode('HLT')
+        proc = Proc([], self.stmtList)
+        proc.translate(main, self.prog)
         self.prog.symbolic()
 
     def compile(self, opt=False):
@@ -836,9 +877,13 @@ class Program:
         print 'linkedCode: \n', str(self.prog), '\n\n'
         self.printToFile('linkedNonOpt.out', str(self.prog))
 
-        symbols = self.prog.dump()
+        symbols = self.prog.dumpSymbolTable()
         print 'symbolTable: \n', symbols
         self.printToFile('symbolTable.out', symbols)
+
+        ar = self.prog.dumpActivationRecords()
+        print 'activationRecords: \n', ar
+        self.printToFile('activationRecords.out', ar)
 
     def printToFile(self, fileName, toOut):
         fout = open(fileName, 'w')

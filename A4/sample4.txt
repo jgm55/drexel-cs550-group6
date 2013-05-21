@@ -1,0 +1,12 @@
+define g
+proc(i)
+return := i
+end;
+
+define h
+proc(i,j)
+return := g(i) + g(j)
+end;
+
+thirty := h(12, 18)
+
