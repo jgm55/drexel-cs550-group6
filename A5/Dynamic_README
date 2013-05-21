@@ -1,0 +1,17 @@
+
+The Dynamic parser gives a different result where 
+a function is called that uses a variable that is redefined in 
+the calling evironment. A dynamic scoping language will use the 
+variable definition in the calling environment, but a static scoping language 
+will use the global definition.
+
+
+Example:
+
+	(define x true)
+	(define (func1) x)
+	(define (func2) (define x false) (func1))
+	
+	(func2) ; returns #t if it is static, #f if it is dynamic
+
+
