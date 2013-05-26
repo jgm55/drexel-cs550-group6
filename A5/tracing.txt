@@ -1,0 +1,194 @@
+Trace the SICP using the input as the following two expressions (you will have to add =, *, -) as primative procedures for this to work
+
+(define (fact n)
+	(if (= n 0) 1 (* n (fact (- n 1 )))))
+	
+(fact 3)
+
+I will be assuming the environment has been loaded and initialized and will beginning with the first call to eval with the user input as an argument.
+In primitive procedures * maps to *, - maps to -, and = maps to define eq?
+
+Say start-exp is (define (fact n) (if (= n 0) 1 (* n (fact (- n 1 )))))
+Say env is the-global-environment
+
+Structure:  * means it is an argument of the thing it is indented under
+
+If it is un-starred, then it is a command within the thing it is indented under
+
+eval
+	*start-exp	
+	*env
+	;;;;the conditions will all fail except for definition so just tracing that
+	definition?
+		*start-exp
+		tagged-list?
+			*start-exp
+			*'define
+			if 
+				*pair? 
+					*start-exp
+					return #t
+				eq? ;;;;true branch
+					*car start-exp
+						return define
+					*tag
+					return #t
+	eval-definition ;;;;definition branch
+		*start-exp
+		*env
+		define-variable!
+			*definition-variable
+				*start-exp
+				if 
+					*symbol? 
+						*cadr start-exp
+							return (fact n)
+						return #f
+				caadr start-exp ;;;;false branch
+					return fact
+			*eval
+				*definition-value
+					*start-exp
+					if
+						*symbol?
+							*cadr start-exp
+								return(fact n)
+							return #f
+						make-lambda ;;;;false branch
+							*cdadr start-exp
+								return n
+							*cddr startexp
+								return (if (= n 0) 1 (* n (fact (- n 1 )))
+							cons
+								*'lambda
+								*cons
+									*n
+									*(if (= n 0) 1 (* n (fact (- n 1 )))
+				*env				
+				;;;;the conditions will all fail except for lambda? so only showing that
+					lambda?
+						*lamnda n (if (= n 0) 1 (* n (fact (- n 1 )))
+						return #t
+					lamnda n (if (= n 0) 1 (* n (fact (- n 1 ))) ;;;;lambda branch		
+			*env
+			letting frame be first-frame env (which is the environment with primitive procedure names and objects)
+			define function scan with parameters vars and vals
+			scan
+				*frame-variables 
+					*frame
+					car frame
+						return (car cdr cons null? + - * / =)
+				*frame-values
+					*frame
+					cdr frame
+						return (car cdr cons null? + - * / eq?) ;;;;but the strings, the functions
+				;;;;it will recursively call scan until vars is null because fact is not yet defined and won't be found in vars, skipping over that to when vars is ()
+				null?
+					*vars
+					()
+				add-binding-to-frame! ;;;;null branch
+					*var
+						is currently fact
+					*val
+						is currently lamnda n (if (= n 0) 1 (* n (fact (- n 1 )))
+					*frame
+					;;;;set-car and set-cdr will append this information to that frame of the environment
+		return ok
+	
+So at this point fact now maps to the appropriate function in the environment
+
+Say start-exp is (fact 3)
+Say env is the modified global environment
+
+
+eval
+	*start-exp
+	*env
+	;;;;all other tests will fail, only showing application
+	application?
+		*start-exp
+		pair?
+			*start-exp
+			return #t
+	apply ;;;;the application branch
+		*eval
+			*operator
+				*start-exp
+					return fact
+			*env
+			;;;; the only test that will pass is self-evaluating?
+			self-evaluating?
+				*exp
+				return the information about fact
+				;;;; the one test that will pass is string?
+					*exp
+					return #t
+			exp ;;;;the self-evaluating branch
+				return fact
+		*list-of-values
+			*operands
+				*start-exp
+				*env
+				cdr start-exp
+					return 3
+			*env
+			if
+				*no-operands?
+					*exps
+					returns #f
+				cons ;;;; false branch
+					*eval
+						*first-operand
+							*exps
+							return 3
+						*env
+						;;;;will follow the path to self evaluating and eventually return 3
+					*list-of-values
+						*rest-operands
+							*exps
+							return ()
+						*env
+						if
+							*no-operands
+								*exp
+								returns #t
+						() ;;;;true branch
+		;;;; the conditions will fail except for compound-procedure, which will pass, skipping straight to that branch
+		eval-sequence ;;;;compound branch
+			*procedure-body
+				*procedure
+				return (if (= n 0) 1 (* n (fact (- n 1 )))))
+			*extend-environment
+				*procedure-parameters
+					*procedure
+					n
+				*arguments
+					will be 3
+				*procedure-environment
+					*procedure
+					return the information related to the functions existing environment
+			;;;;last-exp? will be true, skipping to its contents
+			eval ;;;;last-exp? branch
+				*first-exp
+					*exps
+					(if (= n 0) 1 (* n (fact (- n 1 )))))
+				*env
+				;;;;only if? branch will pass, cutting to its contents
+				eval-if? 
+					*exp 
+					*env
+					if
+						*true?
+						;;;;trace down to see if n == 0, return #f
+						eval
+							*if-alternative
+								*exp
+								;;;;return * n (fact (- n 1))
+							*env
+							;;;;only application will pass, from there it will see * is a primitive-procedure and take that branch cutting to those contents
+							apply-in-underlying-scheme
+								*primitive-implementation
+									**
+								*args
+								;;;;will call the actual scheme apply, which will multiply and fact(n-1).  This will recursively call fact until n==0, at which point it will begin returning all the way up.  The end result will be 6
+

@@ -1,0 +1,55 @@
+Ryan Daugherty
+Joe Muoio
+Thomas Houman
+
+Q1 README
+
+Load mod_int.scm
+
+Q2 README
+
+Load tautology.scm
+
+Q3 README
+
+How to "read" the trace is explained in the file.  Some parts were skipped over (like failed tests in conditions) for brevity's sake.
+
+Traced enough to demonstrate the flow.
+
+Q4 README
+
+Load sicpDynamic.scp
+The Dynamic parser gives a different result where 
+a function is called that uses a variable that is redefined in 
+the calling evironment. A dynamic scoping language will use the 
+variable definition in the calling environment, but a static scoping language 
+will use the global definition.
+
+
+Example:
+
+	(define x true)
+	(define (func1) x)
+	(define (func2) (define x false) (func1))
+	
+	(func2) ; returns #t if it is static, #f if it is dynamic
+
+Q5 README
+
+To use:  Load up minilang.scp in Scheme, then make any definitions you need, then evaluate the program.  Example
+
+(define env ())
+(define prog
+ '((assign n (- 0 5))
+   (if n ((assign i n)) ((assign i (- 0 n))))
+   (assign fact 1)
+   (while i ((assign fact (* fact i)) 
+                  (assign i (- i 1))))))
+
+(eval prog env)
+
+Will return
+((fact 120) (i 0) (n -5))
+
+If you wish to specify a starting environment, it is a list in the format ((var val) (var val)...).
+
