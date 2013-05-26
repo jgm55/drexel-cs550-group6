@@ -1,0 +1,10 @@
+1  0 ; Stack Pointer (SP)
+2  0 ; Frame Pointer (FP)
+3  0 ; Scratch buffer 1 (BUF1)
+4  0 ; Scratch buffer 2 (BUF2)
+5  0 ; Const_0
+6  1 ; Const_1
+7  2 ; Const_2
+8  3 ; Const_3
+9  4 ; Const_4
+10  5 ; Const_5
