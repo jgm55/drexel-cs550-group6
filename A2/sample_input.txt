@@ -1,13 +1,14 @@
 define listlength 
 proc(l) 
-i := 0; 
-ll := l; 
-while (nullp(ll)-1)*(0-1) do 
-i := i + 1; 
-ll := cdr(ll) 
-od; 
-return := i 
-end; 
+	i := 0; 
+	ll := l; 
+	while (nullp(ll)-1)*(0-1) do 
+		i := i + 1; 
+		ll := cdr(ll) 
+	od; 
+	return := i 
+end;
+ 
 sizetwo := listlength([1,2]); 
 a := [1,[[23]], [4,6], 6,7,8,9,0,2,2];
 b := car(a);
@@ -15,4 +16,29 @@ c := cdr(a);
 d := cons(b, c);
 e := [b] || c;
 sizeten := listlength(a);
-sizezero := listlength([])
+sizezero := listlength([]);
+
+metalength := proc(l) 
+	return := l + 10 
+end;
+
+f := metalength(3);
+
+define metafunction proc(func,val) val:=val+1; return := func(val) end;
+g:=metafunction(metalength,2);
+
+define sometafunction proc(val) 
+	a := proc(lll) 
+		return := lll+1 
+	end ;
+	return:= a 
+end;
+
+h := sometafunction(2);
+
+i := h(22)
+
+
+
+
+

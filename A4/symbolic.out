@@ -1,0 +1,7 @@
+JMP __main__
+__main__: LDA Const_2
+ADD Const_3
+STA Temp_0
+LDA Temp_0
+STA a
+HLT
