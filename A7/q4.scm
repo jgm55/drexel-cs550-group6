@@ -19,14 +19,11 @@
     (lambda (frame)
       (let ((stream (qeval (negated-query operands)
                            (singleton-stream frame))))
-           (if (is-singleton-stream? stream)
+           (if (and (not (stream-null? stream))
+                    (stream-null? (stream-cdr stream)))
                stream
                the-empty-stream)))
     frame-stream))
- 
-(define (is-singleton-stream? s)
-  (and (not (stream-null? s))
-       (stream-null? (stream-cdr s))))
 
 ; Put to add the 4.75 solution (in initialize-data-base)
 (put 'unique 'qeval uniquely-asserted) 
