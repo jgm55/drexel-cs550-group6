@@ -20,6 +20,7 @@ from ply import lex
 
 scope_mode = None
 
+
 tokens = (
     'PLUS',
     'MINUS',
@@ -48,7 +49,10 @@ tokens = (
     'CAR',
     'NULLP',
     'INTP',
-    'LISTP'
+    'LISTP',
+    'DOT',
+    'COLON',
+    'CLASSWORD'#not sure if necessay
 )
 
 # These are all caught in the IDENT rule, typed there.
@@ -67,7 +71,8 @@ reserved = {
     'nullp': 'NULLP',
     'cons': 'CONS',
     'intp': 'INTP',
-    'listp': 'LISTP'
+    'listp': 'LISTP',
+    'class': 'CLASSWORD'
 }
 
 # Now, this section.  We have a mapping, REs to token types (please note
@@ -88,6 +93,8 @@ t_CONCAT = r'\|\|'
 t_ASSIGNOP = r':='
 t_SEMICOLON = r';'
 t_COMMA = r','
+t_DOT = r'.'
+t_COLON = r':'
 
 
 def t_IDENT(t):
@@ -131,14 +138,28 @@ import ply.yacc as yacc
 # The rule is given in the doc string
 
 def p_program(p):
-    'program : stmt_list'
+    'program : class_and_stmt_list'
     P = Program(p[1])
     #P.display()
     print 'Running Program'
     P.eval()
     P.dump()
 
-
+def p_stmt_and_class_list(p):
+    '''class_and_stmt_list : class SEMICOLON class_and_stmt_list
+            | stmt_list
+            | class'''
+def p_class(p):
+    '''class : class_non_inherit
+        | class_inherit'''
+    p[0] = p[1]
+def p_class_no_inherit(p):
+    'class_non_inherit : CLASSWORD d_ident LPAREN param_list RPAREN stmt_list END'
+    p[0] = Class()
+    
+def p_class_inherit(p):
+    'class_inherit : CLASSWORD d_ident LPAREN param_list RPAREN COLON d_ident stmt_list END'
+    
 def p_stmt_list(p):
     '''stmt_list : stmt SEMICOLON stmt_list
        | stmt'''
@@ -195,9 +216,6 @@ def p_proc_call(p):
     else:
         raise Exception("Scope not set")
     
-'''def p_proc_set(p):
-    'proc_set : IDENT assignop proc_call'
-    p[0] = AssignStmt(p[1], p[3])'''
 
 def p_mult(p):
     '''term : term TIMES fact'''
@@ -223,9 +241,6 @@ def p_fact_IDENT(p):
     'fact : d_ident'
     p[0] = p[1]
 
-'''def p_assn_1(p):
-    'assign_stmt : IDENT ASSIGNOP expr'
-    p[0] = AssignStmt(p[1], p[3])'''
 def p_assn(p):
     'assign_stmt : IDENT ASSIGNOP expr'
     p[0] = AssignStmt(p[1], p[3])
@@ -304,11 +319,7 @@ def p_sequence_list_element(p):
 def p_list_element_element(p):
     'list_element : expr'
     p[0] = p[1]
-'''
-def p_expr_to_func(p):
-    'expr : func_call'
-    p[0] = p[1]
-'''
+
 def p_expr_to_list(p):
     'expr : list'
     p[0] = p[1]

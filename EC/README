@@ -1,0 +1,52 @@
+Ryan Daugherty
+Joe Muoio
+Thomas Houman
+
+A5
+
+Make commands:
+
+view views the code
+compile-static and compile-dynamic are no-ops
+run-static and run-dynamic accept a program from stdin and run
+clean removes extraneous files
+
+Sample code for usecases
+
+Assigning a function as a variable, passing as an argument, returning a function, nested functions
+metalength := proc(l) 
+	return := l + 10 
+end;
+
+f := metalength(3);
+
+metafunction := proc(func,val) val:=val+1; return := func(val) end;
+g:=metafunction(metalength,2);
+
+sometafunction := proc(val) 
+	a := proc(lll) 
+		return := lll+1 
+	end ;
+	return:= a 
+end;
+
+h := sometafunction(2);
+
+i := h(22)
+
+Unnamed functions
+y := proc(x) return := x*x end (2)
+
+Static vs dynamic functions
+x := 22;
+funca := proc(spare) return := x end;
+funcb := proc(spare) x := 33; return := funca(spare) end;
+z := funcb(1);
+y:=funca(1)
+
+z will be returns 22 if it is static, 33 if it is dynamic
+
+Static variable declaration after function definition
+a := proc (spare) return := x end;
+x := 10;
+b := a(1)
