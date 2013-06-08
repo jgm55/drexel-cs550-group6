@@ -1,0 +1,39 @@
+SICP exercise 4.65
+
+Query:
+(wheel ?who)
+
+The wheel rule:
+(rule (wheel ?person)
+      (and (supervisor ?middle-manager ?person)
+           (supervisor ?x ?middle-manager)))
+
+;;; Query results:
+(wheel (Warbucks Oliver))
+(wheel (Bitdiddle Ben))
+(wheel (Warbucks Oliver))
+(wheel (Warbucks Oliver))
+(wheel (Warbucks Oliver))
+
+Querying for all wheels results in 4 Oliver Warbucks because the first part
+of the (and) returns all supervisor entries:
+(supervisor ?mm ?person)
+;;; Query results:
+(supervisor (aull dewitt) (warbucks oliver))
+(supervisor (cratchet robert) (scrooge eben))
+(supervisor (scrooge eben) (warbucks oliver))
+(supervisor (bitdiddle ben) (warbucks oliver))
+(supervisor (reasoner louis) (hacker alyssa p))
+(supervisor (tweakit lem e) (bitdiddle ben))
+(supervisor (fect cy d) (bitdiddle ben))
+(supervisor (hacker alyssa p) (bitdiddle ben))
+
+Then, the second part of the (and) looks for all supervisors who all middle
+managers. In the case of Oliver Warbucks, this results in 4 matches:
+(supervisor (cratchet robert) (scrooge eben))
+(supervisor (tweakit lem e) (bitdiddle ben))
+(supervisor (fect cy d) (bitdiddle ben))
+(supervisor (hacker alyssa p) (bitdiddle ben))
+
+The wheel query then returns the ?person for each of these results, which is
+why we see 4 entries for Oliver Warbucks.
