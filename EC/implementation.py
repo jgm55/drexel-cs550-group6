@@ -93,13 +93,13 @@ t_CONCAT = r'\|\|'
 t_ASSIGNOP = r':='
 t_SEMICOLON = r';'
 t_COMMA = r','
-t_DOT = r'.'
+t_DOT = r'\.'
 t_COLON = r':'
 
 
 def t_IDENT(t):
-    #r'[a-zA-Z_][a-zA-Z_0-9]*'
-    r'[a-z]+'
+    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    #r'[a-z]+'
     t.type = reserved.get(t.value, 'IDENT')    # Check for reserved words
     return t
 
@@ -138,28 +138,25 @@ import ply.yacc as yacc
 # The rule is given in the doc string
 
 def p_program(p):
-    'program : class_and_stmt_list'
+    'program : stmt_list'
     P = Program(p[1])
     #P.display()
     print 'Running Program'
     P.eval()
     P.dump()
 
-def p_stmt_and_class_list(p):
-    '''class_and_stmt_list : class SEMICOLON class_and_stmt_list
-            | stmt_list
-            | class'''
 def p_class(p):
     '''class : class_non_inherit
         | class_inherit'''
     p[0] = p[1]
 def p_class_no_inherit(p):
-    'class_non_inherit : CLASSWORD d_ident LPAREN param_list RPAREN stmt_list END'
-    p[0] = Class()
+    'class_non_inherit : CLASSWORD IDENT parameters stmt_list END'
+    #p[0] = AssignStmt(p[1], p[3])
+    p[0] = classDef(p[2],p[3],p[4])
     
 def p_class_inherit(p):
-    'class_inherit : CLASSWORD d_ident LPAREN param_list RPAREN COLON d_ident stmt_list END'
-    
+    'class_inherit : CLASSWORD IDENT parameters COLON IDENT stmt_list END'
+    p[0] = classDef(p[2],p[3],p[5],p[6])
 def p_stmt_list(p):
     '''stmt_list : stmt SEMICOLON stmt_list
        | stmt'''
@@ -175,7 +172,8 @@ def p_stmt_list(p):
 def p_stmt(p):
     '''stmt : assign_stmt
                 | while_stmt
-                | if_stmt'''
+                | if_stmt
+                | class'''
     p[0] = p[1]
 
 
@@ -198,21 +196,39 @@ def p_expr_list(p):
         p[3].insert(0, p[1])
         p[0] = p[3]
 
+def p_expr_class_attr(p):
+    'expr : class_attr'
+    p[0] = p[1]
+    
+    
+def p_class_attr(p):
+    '''class_attr : class_func
+                | class_var'''
+    p[0] = p[1]
 
+def p_class_func(p):
+    '''class_func : IDENT DOT IDENT arguments'''
+    p[0] = FunCall(p[3], p[4], p[1])
+
+def p_class_var(p):    
+    '''class_var : IDENT DOT IDENT'''
+    p[0] = classLookup(p[1], p[3])
+    
 def p_expr_term(p):
     'expr : term'
     p[0] = p[1]
-
+    
+    
 def p_expr_to_proccall(p):
     'expr : proc_call'
     p[0] = p[1]
     
 def p_proc_call(p):
-    'proc_call : PROC LPAREN param_list RPAREN stmt_list END'
+    'proc_call : PROC parameters stmt_list END'
     if scope_mode == "static":
-        p[0] = StaticProc(p[3], p[5])
+        p[0] = StaticProc(p[2], p[3])
     elif scope_mode == "dynamic":
-        p[0] = DynamicProc(p[3], p[5])
+        p[0] = DynamicProc(p[2], p[3])
     else:
         raise Exception("Scope not set")
     
@@ -244,7 +260,7 @@ def p_fact_IDENT(p):
 def p_assn(p):
     'assign_stmt : IDENT ASSIGNOP expr'
     p[0] = AssignStmt(p[1], p[3])
-    
+
 def p_while(p):
     'while_stmt : WHILE expr DO stmt_list OD'
     p[0] = WhileStmt(p[2], p[4])
@@ -252,7 +268,12 @@ def p_while(p):
 def p_if(p):
     'if_stmt : IF expr THEN stmt_list ELSE stmt_list FI'
     p[0] = IfStmt(p[2], p[4], p[6])
-
+def p_parameters(p):
+    '''parameters : LPAREN param_list RPAREN'''
+    p[0] = p[2]
+def p_parameters_empty(p):
+    'parameters : LPAREN RPAREN'
+    p[0] = []
 def p_param_list(p):
     '''param_list : IDENT COMMA param_list
                 | IDENT'''
@@ -261,18 +282,24 @@ def p_param_list(p):
     else:  # we have a param_list, keep adding to front
         p[3].insert(0, p[1])
         p[0] = p[3]
+def p_arguments(p):
+    'arguments : LPAREN expr_list RPAREN'
+    p[0] = p[2]    
 
+def p_arg_list_empty(p):
+    'arguments : LPAREN RPAREN'
+    p[0] = []
 def p_expr_to_funcall(p):
     'expr : func_call'
     p[0] = p[1]
 
 def p_inline_func_call(p):
-    'func_call : proc_call LPAREN expr_list RPAREN'
-    p[0] = InlineFunCall(p[1], p[3])
+    'func_call : proc_call arguments'
+    p[0] = InlineFunCall(p[1], p[2])
 	
 def p_func_call(p):
-    'func_call : IDENT LPAREN expr_list RPAREN'
-    p[0] = FunCall(p[1], p[3])
+    'func_call : IDENT arguments'
+    p[0] = FunCall(p[1], p[2])
 
 
 # Error rule for syntax errors
