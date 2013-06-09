@@ -1,0 +1,56 @@
+CS550 Group 6
+Tom Houman (A7 Leader)
+Ryan Daugherty
+Joe Muoio
+CS550 Spring 2013
+Assignment 7
+
+Question 1
+----------
+Files:
+* q1.scm - The solution code and queries
+* q1_support.scm - ch4-query.scm, modified to support q1 queries
+
+Testing:
+- Load q1.scm into scheme
+- Run the queries in q1.scm, which are listed after (query-driver-loop)
+
+Question 2
+----------
+Files:
+* q2.txt - The solution, step by step
+
+Testing:
+- Manually load the wheel rule from q2.txt into a copy of ch4-query.scm
+- Execute the wheel query
+
+Question 3
+----------
+Files:
+* q3.scm - Solution and sample queries, implemented in simple query language
+* q3_support.scm - ch4-query.scm, modified with rule for reversing a list
+* q3.pl - Solution and sample queries, implemented in prolog
+
+Testing:
+- (scheme) Load q3.scm into scheme and run the sample queries
+- (prolog) Load q3.pl into prolog and run the sample queries
+
+Question 4
+----------
+Files:
+* q4.scm - Solution and sample queries
+* q4_support.scm - ch4-query.scm, modified with solution logic
+
+Testing:
+- Load q4.scm into scheme
+- Run the test query in q4.scm, which is listed after (query-driver-loop)
+
+Question 5
+----------
+Files:
+* mini3.pl - Mini language interpreter implemented in prolog
+
+Testing:
+- Load mini3.pl into prolog
+- Execute any of the test queries in the header of mini3.pl
+- Note: All test queries have been successfully interpreted on tux

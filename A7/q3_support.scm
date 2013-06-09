@@ -1,3 +1,15 @@
+; CS550 Group 6
+; Tom Houman (A7 Leader)
+; Ryan Daugherty
+; Joe Muoio
+; CS550 Spring 2013
+; Assignment 7
+;
+; q3_support.scm
+; Assignment 7, question 4
+; Everything below is taken from ch4-query.scm, with the addition
+; of the code required for SICP exercise 4.68
+
 ;;;;QUERY SYSTEM FROM SECTION 4.4.4 OF
 ;;;; STRUCTURE AND INTERPRETATION OF COMPUTER PROGRAMS
 

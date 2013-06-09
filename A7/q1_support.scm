@@ -1,5 +1,14 @@
-;;; Everything below is taken from ch4-query.scm, with the addition
-;;; of the meeting database entries required for SICP exercise 4.59
+; CS550 Group 6
+; Tom Houman (A7 Leader)
+; Ryan Daugherty
+; Joe Muoio
+; CS550 Spring 2013
+; Assignment 7
+;
+; q1_support.scm
+; Assignment 7, question 1
+; Everything below is taken from ch4-query.scm, with the addition
+; of the meeting database entries required for SICP exercise 4.59
 
 
 ;;;;QUERY SYSTEM FROM SECTION 4.4.4 OF

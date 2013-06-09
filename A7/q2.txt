@@ -1,4 +1,13 @@
-SICP exercise 4.65
+; CS550 Group 6
+; Tom Houman (A7 Leader)
+; Ryan Daugherty
+; Joe Muoio
+; CS550 Spring 2013
+; Assignment 7
+;
+; q2.txt
+; Assignment 7, question 1
+; SICP exercise 4.65
 
 Query:
 (wheel ?who)

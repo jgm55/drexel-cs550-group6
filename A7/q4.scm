@@ -1,5 +1,14 @@
-;;; SICP exercise 4.75
-;;; Special form for query language: unique
+; CS550 Group 6
+; Tom Houman (A7 Leader)
+; Ryan Daugherty
+; Joe Muoio
+; CS550 Spring 2013
+; Assignment 7
+;
+; q4.scm
+; Assignment 7, question 4
+; SICP exercise 4.75
+; Special form for query language: unique
 
 ;;; Load the support functions
 (load "q4_support.scm")
